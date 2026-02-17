@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 210 17% 98%;
+  --foreground: 220 12% 12%;
+  --card: 0 0% 100%;
+  --card-foreground: 220 12% 12%;
+  --primary: 32 100% 49%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 16% 96%;
+  --secondary-foreground: 220 12% 12%;
+  --muted: 210 16% 96%;
+  --muted-foreground: 215 14% 44%;
+  --accent: 9 95% 51%;
+  --accent-foreground: 222 28% 16%;
+  --border: 220 13% 91%;
+  --input: 220 13% 91%;
+  --ring: 9 95% 51%;
+  --destructive: 0 70% 45%;
+  --destructive-foreground: 0 0% 100%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  font-family: var(--font-body), sans-serif;
+  @apply bg-background text-foreground antialiased;
+  background:
+    radial-gradient(900px 480px at 6% -6%, rgba(142,180,194,0.06), transparent 40%),
+    radial-gradient(800px 420px at 100% 0%, rgba(251,133,0,0.06), transparent 45%),
+    linear-gradient(180deg, #071122 0%, #0b1724 55%, #071122 100%);
+  min-height: 100vh;
+  color: #e6eef6;
+}
+
+.font-display {
+  font-family: var(--font-heading), sans-serif;
+}
+
+.container-pad {
+  @apply px-4 md:px-6;
+}
+
+.section-title {
+  font-family: var(--font-heading), sans-serif;
+  @apply text-3xl font-bold tracking-tight text-[#210E14] md:text-[2.6rem];
+}
+
+.section-tag {
+  @apply inline-flex items-center gap-2 text-sm font-semibold text-[#F92D0A];
+}
+
+.section-tag::before {
+  content: "";
+  width: 10px;
+  height: 22px;
+  border-radius: 999px;
+  background: #F92D0A;
+}
+
+.icon-circle {
+  @apply inline-flex size-10 items-center justify-center rounded-full text-white;
+  background: linear-gradient(140deg, #210E14, #712825 55%, #F92D0A);
+  box-shadow: 0 10px 24px -14px rgba(249, 45, 10, 0.8);
+}
+
+.glass-panel {
+  @apply rounded-2xl border border-white/55 bg-white/80 backdrop-blur-md;
+  box-shadow:
+    0 26px 45px -36px rgba(33, 14, 20, 0.75),
+    0 8px 24px -18px rgba(40, 50, 63, 0.45);
+}
+
+.lava-button {
+  @apply rounded-md px-6 py-2.5 text-sm font-semibold text-white transition duration-300;
+  background: linear-gradient(92deg, #fb8500 0%, #f92d0a 48%, #712825 100%);
+  box-shadow: 0 16px 24px -16px rgba(249, 45, 10, 0.95);
+}
+
+.lava-button:hover {
+  transform: translateY(-1px);
+  filter: saturate(1.12);
+  box-shadow: 0 20px 30px -16px rgba(113, 40, 37, 0.85);
+}
+
+.animate-fade-up {
+  animation: fadeUp 500ms ease both;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+::selection {
+  background: rgba(249, 45, 10, 0.18);
+  color: #210e14;
+}
