@@ -1,26 +1,18 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/product-card";
-import { categories, storeItems } from "@/lib/store-data";
+import { extractCategories, fetchCatalogProducts, formatCategory, toCategorySlug } from "@/lib/catalog";
 
-const categoryMap: Record<string, string[]> = {
-  all: [],
-  "woman-fashion": ["coat", "jacket", "bag"],
-  "womans-fashion": ["coat", "jacket", "bag"],
-  "mens-fashion": ["coat", "jacket"],
-  electronics: ["monitor", "keyboard", "cooler", "gamepad", "headphone"],
-  "home-and-lifestyle": ["bookself", "bookshelf"],
-  medicine: [],
-  "sports-and-outdoor": ["gamepad"],
-  "babys-and-toys": ["kids-electric-car", "car"],
-  "groceries-and-pets": [],
-  "health-and-beauty": [],
-  phones: [],
-  computers: ["monitor", "keyboard", "cooler", "headphone"],
-  smartwatch: [],
-  camera: [],
-  headphone: ["headphone"],
-  gaming: ["gamepad", "keyboard", "monitor"]
+const CATEGORY_ALIAS: Record<string, string[]> = {
+  "womans-fashion": ["womens-dresses", "womens-shoes", "womens-watches", "tops", "womens-bags"],
+  "mens-fashion": ["mens-shirts", "mens-shoes", "mens-watches"],
+  electronics: ["smartphones", "laptops", "tablets", "mobile-accessories"],
+  "home-and-lifestyle": ["home-decoration", "furniture", "kitchen-accessories"],
+  medicine: ["skin-care"],
+  "sports-and-outdoor": ["sports-accessories", "motorcycle"],
+  "babys-and-toys": ["vehicle"],
+  "groceries-and-pets": ["groceries"],
+  "health-and-beauty": ["beauty", "fragrances", "skin-care"]
 };
 
 export default async function CategoryPage({
@@ -30,18 +22,35 @@ export default async function CategoryPage({
 }) {
   const { slug } = await params;
   const normalized = slug.toLowerCase();
+  const products = await fetchCatalogProducts();
+  const categories = extractCategories(products);
+  const categorySlugs = categories.map((category) => toCategorySlug(category));
+  const aliasTargets = CATEGORY_ALIAS[normalized];
 
-  if (!categoryMap[normalized] && normalized !== "all") {
+  const items =
+    normalized === "all"
+      ? products
+      : aliasTargets
+        ? products.filter((item) => aliasTargets.includes(toCategorySlug(item.category)))
+        : products.filter((item) => toCategorySlug(item.category) === normalized);
+  const sortedItems =
+    normalized === "electronics"
+      ? [...items].sort((a, b) => {
+          const aPhone = toCategorySlug(a.category) === "smartphones" ? 0 : 1;
+          const bPhone = toCategorySlug(b.category) === "smartphones" ? 0 : 1;
+          return aPhone - bPhone;
+        })
+      : items;
+
+  if (
+    normalized !== "all" &&
+    !categorySlugs.includes(normalized) &&
+    !CATEGORY_ALIAS[normalized]
+  ) {
     return notFound();
   }
 
-  const keywords = categoryMap[normalized] ?? [];
-  const items =
-    normalized === "all"
-      ? storeItems
-      : storeItems.filter((item) => keywords.some((word) => item.slug.includes(word)));
-
-  const pageTitle = readable(normalized);
+  const pageTitle = normalized === "all" ? "All Products" : readableCategoryTitle(normalized, items[0]?.category);
 
   return (
     <div className="space-y-10 pb-8">
@@ -53,26 +62,26 @@ export default async function CategoryPage({
         <Link href="/categories/all" className="rounded-md border border-[#dce3ea] bg-white px-3 py-1.5 text-sm text-[#210E14] hover:border-[#F92D0A] hover:text-[#F92D0A]">
           All
         </Link>
-        {categories.map((category) => (
+        {categories.slice(0, 14).map((category) => (
           <Link
             key={category}
-            href={`/categories/${toSlug(category)}`}
+            href={`/categories/${toCategorySlug(category)}`}
             className="rounded-md border border-[#dce3ea] bg-white px-3 py-1.5 text-sm text-[#210E14] transition hover:border-[#F92D0A] hover:text-[#F92D0A]"
           >
-            {category}
+            {formatCategory(category)}
           </Link>
         ))}
       </div>
 
-      <h1 className="section-title">{pageTitle}</h1>
+      <h1 className="section-title !text-white">{pageTitle}</h1>
 
-      {items.length === 0 ? (
+      {sortedItems.length === 0 ? (
         <div className="glass-panel p-8 text-sm text-zinc-600">
           Products for this category are coming soon.
         </div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {items.map((item) => (
+          {sortedItems.map((item) => (
             <ProductCard key={item.id} product={item} />
           ))}
         </div>
@@ -81,17 +90,18 @@ export default async function CategoryPage({
   );
 }
 
-function readable(slug: string) {
-  return slug
-    .split("-")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
-}
-
-function toSlug(value: string) {
-  return value
-    .toLowerCase()
-    .replaceAll("&", "and")
-    .replaceAll("'", "")
-    .replaceAll(/\s+/g, "-");
+function readableCategoryTitle(slug: string, category?: string) {
+  const titleMap: Record<string, string> = {
+    "womans-fashion": "Woman's Fashion",
+    "mens-fashion": "Men's Fashion",
+    electronics: "Electronics",
+    "home-and-lifestyle": "Home & Lifestyle",
+    medicine: "Medicine",
+    "sports-and-outdoor": "Sports & Outdoor",
+    "babys-and-toys": "Baby's & Toys",
+    "groceries-and-pets": "Groceries & Pets",
+    "health-and-beauty": "Health & Beauty"
+  };
+  if (titleMap[slug]) return titleMap[slug];
+  return formatCategory(category ?? slug);
 }

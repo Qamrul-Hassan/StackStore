@@ -3,20 +3,25 @@
 @tailwind utilities;
 
 :root {
-  --background: 210 17% 98%;
-  --foreground: 220 12% 12%;
+  --lava-1: #FB8500;
+  --lava-2: #F92D0A;
+  --lava-3: #712825;
+  --lava-4: #210E14;
+  --lava-5: #28323F;
+  --background: 210 11% 97%;
+  --foreground: 331 38% 10%;
   --card: 0 0% 100%;
-  --card-foreground: 220 12% 12%;
+  --card-foreground: 331 38% 10%;
   --primary: 32 100% 49%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 210 16% 96%;
-  --secondary-foreground: 220 12% 12%;
-  --muted: 210 16% 96%;
-  --muted-foreground: 215 14% 44%;
+  --secondary: 210 14% 95%;
+  --secondary-foreground: 331 38% 10%;
+  --muted: 210 14% 95%;
+  --muted-foreground: 220 22% 24%;
   --accent: 9 95% 51%;
-  --accent-foreground: 222 28% 16%;
-  --border: 220 13% 91%;
-  --input: 220 13% 91%;
+  --accent-foreground: 331 38% 10%;
+  --border: 220 15% 90%;
+  --input: 220 15% 90%;
   --ring: 9 95% 51%;
   --destructive: 0 70% 45%;
   --destructive-foreground: 0 0% 100%;
@@ -30,11 +35,14 @@ body {
   font-family: var(--font-body), sans-serif;
   @apply bg-background text-foreground antialiased;
   background:
-    radial-gradient(900px 480px at 6% -6%, rgba(142,180,194,0.06), transparent 40%),
-    radial-gradient(800px 420px at 100% 0%, rgba(251,133,0,0.06), transparent 45%),
-    linear-gradient(180deg, #071122 0%, #0b1724 55%, #071122 100%);
+    radial-gradient(900px 480px at 6% -6%, rgba(251,133,0,0.09), transparent 40%),
+    radial-gradient(800px 420px at 100% 0%, rgba(249,45,10,0.09), transparent 45%),
+    linear-gradient(180deg, #210E14 0%, #28323F 55%, #210E14 100%);
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-size: auto, auto, auto;
+  background-position: 6% -6%, 100% 0%, center;
   min-height: 100vh;
-  color: #e6eef6;
+  color: #f4f5f8;
 }
 
 .font-display {
@@ -52,6 +60,7 @@ body {
 
 .section-tag {
   @apply inline-flex items-center gap-2 text-sm font-semibold text-[#F92D0A];
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
 }
 
 .section-tag::before {
@@ -69,26 +78,205 @@ body {
 }
 
 .glass-panel {
-  @apply rounded-2xl border border-white/55 bg-white/80 backdrop-blur-md;
+  @apply rounded-2xl border border-white/45 bg-[linear-gradient(170deg,rgba(255,255,255,0.93)_0%,rgba(241,245,250,0.85)_52%,rgba(228,235,243,0.8)_100%)] backdrop-blur-md;
+  color: #210E14;
   box-shadow:
-    0 26px 45px -36px rgba(33, 14, 20, 0.75),
-    0 8px 24px -18px rgba(40, 50, 63, 0.45);
+    0 34px 48px -36px rgba(33, 14, 20, 0.82),
+    0 10px 26px -18px rgba(40, 50, 63, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.68);
+}
+
+.on-dark {
+  color: #f4f7fb;
+}
+
+.on-dark-muted {
+  color: #c4cfdd;
 }
 
 .lava-button {
   @apply rounded-md px-6 py-2.5 text-sm font-semibold text-white transition duration-300;
-  background: linear-gradient(92deg, #fb8500 0%, #f92d0a 48%, #712825 100%);
-  box-shadow: 0 16px 24px -16px rgba(249, 45, 10, 0.95);
+  background: linear-gradient(105deg, #210e14 0%, #712825 38%, #f92d0a 74%, #fb8500 100%);
+  box-shadow: 0 18px 28px -16px rgba(249, 45, 10, 0.95);
 }
 
 .lava-button:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
   filter: saturate(1.12);
-  box-shadow: 0 20px 30px -16px rgba(113, 40, 37, 0.85);
+  box-shadow: 0 24px 34px -16px rgba(113, 40, 37, 0.88);
 }
 
 .animate-fade-up {
   animation: fadeUp 500ms ease both;
+}
+
+/* Main background shopping-cart motif */
+.main-cart-bg {
+  position: relative;
+  isolation: isolate;
+}
+
+.main-cart-bg::before {
+  content: "";
+  position: absolute;
+  inset: -16px 0 0 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.16;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120' fill='none'%3E%3Cpath d='M18 24h10l8 48h52l8-30H36' stroke='%23748692' stroke-width='5.1' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='48' cy='92' r='8' fill='%23FB8500'/%3E%3Ccircle cx='86' cy='92' r='8' fill='%23F92D0A'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 340px 340px;
+  background-position: 126% 46%;
+  filter: drop-shadow(0 12px 18px rgba(33, 14, 20, 0.26));
+}
+
+.main-cart-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(220px 220px at 90% 10%, rgba(251, 133, 0, 0.06), transparent 72%),
+    radial-gradient(240px 240px at 14% 86%, rgba(142, 180, 194, 0.06), transparent 72%);
+}
+
+.main-cart-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
+.section-single-cart {
+  position: relative;
+  overflow: visible;
+  isolation: isolate;
+}
+
+.section-single-cart::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.24;
+  width: 290px;
+  height: 290px;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120' fill='none'%3E%3Cpath d='M18 24h10l8 48h52l8-30H36' stroke='%238EB4C2' stroke-width='5.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='48' cy='92' r='8' fill='%23FB8500'/%3E%3Ccircle cx='86' cy='92' r='8' fill='%23F92D0A'/%3E%3Cpath d='M27 31h66' stroke='%23712825' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E");
+  filter: drop-shadow(0 14px 20px rgba(33, 14, 20, 0.35));
+}
+
+.cart-left::before {
+  left: -286px;
+  top: 20%;
+  transform: rotate(-18deg) scale(1.02);
+}
+
+.cart-right::before {
+  right: -292px;
+  top: 18%;
+  transform: rotate(16deg) scale(1.02);
+}
+
+.section-single-cart > * {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 1279px) {
+  .section-single-cart::before {
+    width: 220px;
+    height: 220px;
+    opacity: 0.2;
+  }
+
+  .cart-left::before {
+    left: -166px;
+  }
+
+  .cart-right::before {
+    right: -170px;
+  }
+
+}
+
+@media (max-width: 1023px) {
+  .section-single-cart::before {
+    display: none;
+  }
+}
+
+/* Subtle shopping-cart decor pattern for section backgrounds */
+.section-decor-cart {
+  position: relative;
+  overflow: hidden;
+}
+
+.section-decor-cart::before,
+.section-decor-cart::after {
+  content: "";
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  pointer-events: none;
+  opacity: 0.24;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120' fill='none'%3E%3Cpath d='M18 24h10l8 48h52l8-30H36' stroke='%23210E14' stroke-width='5.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='48' cy='92' r='8' fill='%23FB8500'/%3E%3Ccircle cx='86' cy='92' r='8' fill='%23F92D0A'/%3E%3Cpath d='M27 31h66' stroke='%23712825' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E");
+  filter: drop-shadow(0 8px 14px rgba(33, 14, 20, 0.28));
+}
+
+.section-decor-cart > * {
+  position: relative;
+  z-index: 1;
+}
+
+.decor-a::before {
+  top: -34px;
+  right: -30px;
+  transform: rotate(14deg);
+}
+
+.decor-a::after {
+  bottom: -40px;
+  left: -32px;
+  transform: rotate(-18deg) scale(0.95);
+}
+
+.decor-b::before {
+  top: 8px;
+  left: -42px;
+  transform: rotate(-20deg) scale(0.9);
+}
+
+.decor-b::after {
+  bottom: -42px;
+  right: -34px;
+  transform: rotate(22deg);
+}
+
+.decor-c::before {
+  top: -42px;
+  left: 45%;
+  transform: rotate(10deg) scale(0.88);
+}
+
+.decor-c::after {
+  bottom: -42px;
+  right: 10%;
+  transform: rotate(-16deg) scale(0.96);
+}
+
+.decor-d::before {
+  top: 12%;
+  right: -40px;
+  transform: rotate(24deg) scale(0.92);
+}
+
+.decor-d::after {
+  bottom: -44px;
+  left: 8%;
+  transform: rotate(-24deg) scale(0.92);
 }
 
 @keyframes fadeUp {

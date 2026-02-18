@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
-import { RotateCcw, ShieldCheck, Truck } from "lucide-react";
+import { Heart, RotateCcw, ShieldCheck, Truck } from "lucide-react";
 import { useCart } from "@/components/cart-provider";
 import { useWishlist } from "@/components/wishlist-provider";
 
@@ -21,7 +21,7 @@ type Props = {
   optionGroups: OptionGroup[];
 };
 
-const COLORS = ["#8EB4C2", "#F92D0A", "#28323F"];
+const COLORS = ["#FB8500", "#F92D0A", "#712825", "#210E14", "#28323F"];
 
 export function ProductDetailsInteractive({
   product,
@@ -77,7 +77,7 @@ export function ProductDetailsInteractive({
       <div className="space-y-5 rounded-xl border border-[#dce3ea] bg-white/90 p-6 text-[#210E14] shadow-[0_24px_40px_-30px_rgba(33,14,20,0.7)] backdrop-blur-sm">
         <h1 className="font-display text-[3rem] font-semibold leading-tight">{product.name}</h1>
         <p className="text-sm text-zinc-500">
-          ★★★★★ ({reviews} Reviews) | <span className="text-green-600">In Stock</span>
+          Rated 5/5 ({reviews} Reviews) | <span className="text-green-600">In Stock</span>
         </p>
         <p className="text-4xl font-semibold">${product.price.toFixed(2)}</p>
         <p className="text-sm text-zinc-600">{description}</p>
@@ -175,7 +175,7 @@ export function ProductDetailsInteractive({
                 : "border-[#dce3ea] bg-white hover:border-[#F92D0A] hover:text-[#F92D0A]"
             }`}
           >
-            ♡
+            <Heart className="size-4" />
           </button>
         </div>
 

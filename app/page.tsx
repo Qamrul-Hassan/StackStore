@@ -9,164 +9,229 @@ import {
   ChevronRight,
   Gamepad2,
   Headphones,
-  Headset,
   Laptop,
   ShieldCheck,
   Smartphone,
-  Truck
+  Truck,
+  Watch
 } from "lucide-react";
-import { ReactNode, useMemo } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import { useDataContext } from "@/components/data-context";
 import { ProductCard } from "@/components/product-card";
-import { categories, storeItems } from "@/lib/store-data";
+import type { CatalogProduct } from "@/lib/catalog";
+import { formatCategory, toCategorySlug } from "@/lib/catalog";
+import { storeItems } from "@/lib/store-data";
+
+const fallbackProducts: CatalogProduct[] = storeItems.map((item) => ({
+  id: item.id,
+  slug: item.slug,
+  name: item.name,
+  description: `${item.name} from our curated catalog.`,
+  imageUrl: item.imageUrl,
+  images: item.images?.length ? item.images : [item.imageUrl, item.imageUrl, item.imageUrl, item.imageUrl],
+  price: item.price,
+  oldPrice: item.oldPrice,
+  rating: item.rating,
+  reviews: item.reviews,
+  badge: item.badge,
+  category: "featured",
+  stock: 25,
+  discountPercentage: undefined,
+  colors: ["#FB8500", "#F92D0A", "#712825", "#210E14", "#28323F"]
+}));
+
+const HERO_PHONE_TARGETS = [
+  ["iphone", "9"],
+  ["iphone", "x"],
+  ["samsung", "universe", "9"],
+  ["oppo", "f19"],
+  ["huawei", "p30"]
+];
+const HERO_PRODUCT_IDS = ["dj-1", "dj-2", "dj-3", "dj-4", "dj-5"];
 
 export default function HomePage() {
   const { products, loadingProducts } = useDataContext();
-  const heroCategoryLinks = [
-    { label: "Woman's Fashion", href: "/categories/womans-fashion" },
-    { label: "Men's Fashion", href: "/categories/mens-fashion" },
-    { label: "Electronics", href: "/categories/electronics" },
-    { label: "Home & Lifestyle", href: "/categories/home-and-lifestyle" },
-    { label: "Medicine", href: "/categories/medicine" },
-    { label: "Sports & Outdoor", href: "/categories/sports-and-outdoor" },
-    { label: "Baby's & Toys", href: "/categories/babys-and-toys" },
-    { label: "Groceries & Pets", href: "/categories/groceries-and-pets" },
-    { label: "Health & Beauty", href: "/categories/health-and-beauty" }
-  ];
+  const catalog = products.length > 0 ? products : fallbackProducts;
+  const [heroPage, setHeroPage] = useState(0);
+  const [explorePage, setExplorePage] = useState(0);
 
-  const electronicsProducts = useMemo(
-    () => products.filter((product) => product.category === "electronics"),
-    [products]
+  const heroCategories = [
+    "Woman's Fashion",
+    "Men's Fashion",
+    "Electronics",
+    "Home & Lifestyle",
+    "Medicine",
+    "Sports & Outdoor",
+    "Baby's & Toys",
+    "Groceries & Pets",
+    "Health & Beauty"
+  ];
+  const heroProducts = useMemo(() => {
+    const phoneLike = catalog.filter((item) => {
+      const category = toCategorySlug(item.category);
+      const name = normalizeName(item.name);
+      return (
+        category.includes("smartphone") ||
+        name.includes("iphone") ||
+        name.includes("samsung") ||
+        name.includes("oppo") ||
+        name.includes("huawei") ||
+        name.includes("phone")
+      );
+    });
+
+    const picked: CatalogProduct[] = [];
+    const taken = new Set<string>();
+
+    for (const id of HERO_PRODUCT_IDS) {
+      const byId = catalog.find((item) => item.id === id);
+      if (byId && !taken.has(byId.id)) {
+        picked.push(byId);
+        taken.add(byId.id);
+      }
+    }
+
+    for (const targetTokens of HERO_PHONE_TARGETS) {
+      const match = phoneLike.find((item) => {
+        const normalizedName = normalizeName(item.name);
+        return targetTokens.every((token) => normalizedName.includes(normalizeName(token)));
+      });
+      if (match && !taken.has(match.id)) {
+        picked.push(match);
+        taken.add(match.id);
+      }
+    }
+
+    const fillPool = (phoneLike.length > 0 ? phoneLike : catalog).filter(
+      (item) => !taken.has(item.id)
+    );
+    const required = 5;
+    const withFill = [...picked];
+    for (const item of fillPool) {
+      if (withFill.length >= required) break;
+      withFill.push(item);
+    }
+
+    return withFill.length > 0 ? withFill : catalog.slice(0, 5);
+  }, [catalog]);
+  const heroPageCount = Math.max(1, heroProducts.length);
+  const safeHeroPage = heroPage % heroPageCount;
+  const activeHeroProduct = heroProducts[safeHeroPage] ?? heroProducts[0] ?? catalog[0] ?? fallbackProducts[0];
+  const heroTitle = getHeroTopLabel(activeHeroProduct.name);
+  const heroImage = getHeroImageForProduct(activeHeroProduct.name, activeHeroProduct.imageUrl);
+  const heroDiscount = Math.max(
+    10,
+    Math.round(
+      activeHeroProduct.discountPercentage ??
+        (activeHeroProduct.oldPrice && activeHeroProduct.oldPrice > activeHeroProduct.price
+          ? ((activeHeroProduct.oldPrice - activeHeroProduct.price) / activeHeroProduct.oldPrice) * 100
+          : 0)
+    )
   );
 
-  const mergedItems = useMemo(() => {
-    if (loadingProducts || products.length === 0) return storeItems;
+  const flashSale = useMemo(
+    () =>
+      [...catalog]
+        .sort((a, b) => (b.discountPercentage ?? 0) - (a.discountPercentage ?? 0))
+        .slice(0, 4),
+    [catalog]
+  );
 
-    const apparelProducts = products.filter((product) =>
-      ["men's clothing", "women's clothing"].includes(product.category)
-    );
-    const jewelryProducts = products.filter((product) => product.category === "jewelery");
+  const bestSelling = useMemo(
+    () => [...catalog].sort((a, b) => b.rating - a.rating).slice(0, 4),
+    [catalog]
+  );
 
-    const pickElectronics = (index: number) => electronicsProducts[index];
-    const pickApparel = (index: number) => apparelProducts[index];
-    const pickJewelry = (index: number) => jewelryProducts[index];
+  const explore = useMemo(() => catalog.slice(0, 16), [catalog]);
+  const explorePageSize = 8;
+  const explorePageCount = Math.max(1, Math.ceil(explore.length / explorePageSize));
+  const safeExplorePage = explorePage % explorePageCount;
+  const activeExplore = useMemo(() => {
+    const start = safeExplorePage * explorePageSize;
+    return explore.slice(start, start + explorePageSize);
+  }, [explore, safeExplorePage]);
+  const featured = useMemo(() => catalog.slice(8, 12), [catalog]);
+  const promoProduct = catalog[1] ?? fallbackProducts[1] ?? fallbackProducts[0];
 
-    return storeItems.map((item, index) => {
-      let apiItem = products[index];
-
-      if (item.slug === "havit-hv-g92-gamepad") apiItem = pickElectronics(0) ?? apiItem;
-      if (item.slug === "ak-900-wired-keyboard") apiItem = pickElectronics(1) ?? apiItem;
-      if (item.slug === "ips-lcd-gaming-monitor")
-        apiItem = electronicsProducts.find((p) => p.title.toLowerCase().includes("monitor")) ?? pickElectronics(2) ?? apiItem;
-      if (item.slug === "rgb-liquid-cpu-cooler")
-        apiItem = pickElectronics(3) ?? apiItem;
-      if (item.slug === "the-north-coat") apiItem = pickApparel(0) ?? apiItem;
-      if (item.slug === "gucci-duffle-bag") apiItem = pickJewelry(0) ?? apiItem;
-      if (item.slug === "wh-1000xm-headphone") return item;
-      if (item.slug === "kids-electric-car") apiItem = pickJewelry(1) ?? apiItem;
-
-      if (!apiItem) return item;
-
-      return {
-        ...item,
-        name: apiItem.title || item.name,
-        imageUrl: apiItem.image || item.imageUrl,
-        images: apiItem.image ? [apiItem.image, apiItem.image, apiItem.image, apiItem.image] : item.images,
-        price: typeof apiItem.price === "number" ? Math.round(apiItem.price * 10) : item.price,
-        oldPrice:
-          typeof apiItem.price === "number"
-            ? Math.round(apiItem.price * 12)
-            : item.oldPrice,
-        rating: apiItem.rating?.rate ?? item.rating,
-        reviews: apiItem.rating?.count ?? item.reviews
-      };
-    });
-  }, [electronicsProducts, loadingProducts, products]);
-
-  const flashSale = mergedItems.slice(0, 4);
-  const bestSelling = mergedItems.slice(4, 8);
-  const explore = [...mergedItems, ...mergedItems].slice(0, 8);
-  const electronicsShowcase = [
-    mergedItems.find((item) => item.slug === "havit-hv-g92-gamepad"),
-    mergedItems.find((item) => item.slug === "ak-900-wired-keyboard"),
-    mergedItems.find((item) => item.slug === "ips-lcd-gaming-monitor"),
-    mergedItems.find((item) => item.slug === "rgb-liquid-cpu-cooler")
-  ].filter(Boolean);
-
-  const heroProduct = electronicsShowcase[0] ?? mergedItems[0];
-  const promoProduct =
-    mergedItems.find((item) => item.slug === "wh-1000xm-headphone") ??
-    electronicsShowcase[1] ??
-    mergedItems[1] ??
-    mergedItems[0];
-  const featuredMain = electronicsShowcase[2] ?? mergedItems[2] ?? mergedItems[0];
-  const featuredTopRight = electronicsShowcase[3] ?? mergedItems[3] ?? mergedItems[1];
-  const featuredBottomLeft = mergedItems[4] ?? mergedItems[2];
-  const featuredBottomRight = mergedItems[5] ?? mergedItems[3];
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setHeroPage((prev) => (prev + 1) % heroPageCount);
+    }, 5000);
+    return () => window.clearInterval(timer);
+  }, [heroPageCount]);
 
   return (
-    <div className="space-y-16 pb-8">
-      <section id="hero" className="grid gap-6 lg:grid-cols-[220px_1fr]">
-        <aside className="glass-panel hidden p-4 lg:block">
-          <ul className="space-y-3 pt-2 text-sm text-[#210E14]">
-            {heroCategoryLinks.map((item) => (
-              <li key={item.label}>
+    <div className="space-y-12 pb-12 pt-12 md:space-y-14 md:pt-14 lg:space-y-16 lg:pt-16">
+      <section id="hero" className="section-single-cart cart-left mt-0 grid gap-6 lg:grid-cols-[265px_1fr]">
+        <aside className="glass-panel hidden p-5 lg:block">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-[#712825]">Shop Categories</p>
+          <ul className="space-y-2.5 text-sm text-[#210E14]">
+            {heroCategories.map((category) => (
+              <li key={category}>
                 <Link
-                  href={item.href}
-                  className="block transition hover:text-[#F92D0A]"
+                  href={`/categories/${getHomeCategorySlug(category)}`}
+                  className="flex items-center justify-between rounded-lg px-2.5 py-2 transition hover:bg-[#FB8500]/10 hover:text-[#F92D0A]"
                 >
-                  {item.label}
+                  <span>{category}</span>
+                  <ChevronRight className="size-4" />
                 </Link>
               </li>
             ))}
           </ul>
         </aside>
 
-        <div className="relative overflow-hidden rounded-2xl border border-[#28323F] bg-[#210E14] p-8 text-white shadow-[0_28px_50px_-26px_rgba(33,14,20,0.84)] md:p-10">
-          <div className="pointer-events-none absolute -right-16 -top-16 size-44 rounded-full bg-[#FB8500]/30 blur-3xl" />
-          <div className="pointer-events-none absolute -left-16 bottom-0 size-52 rounded-full bg-[#8EB4C2]/20 blur-3xl" />
-          <div className="grid gap-6 md:grid-cols-2 md:items-center">
-            <div className="space-y-4">
-              <p className="text-sm text-[#8EB4C2]">iPhone 14 Series</p>
-              <h1 className="text-5xl font-semibold leading-tight md:text-6xl">Up to 10% off Voucher</h1>
+        <div className="relative overflow-hidden rounded-2xl border border-[#344154] bg-gradient-to-r from-[#210E14] via-[#28323F] to-[#210E14] px-7 pb-7 pt-8 text-white shadow-[0_40px_62px_-38px_rgba(33,14,20,0.95)] md:px-10">
+          <div className="pointer-events-none absolute -left-20 top-1/2 size-72 -translate-y-1/2 rounded-full bg-[#FB8500]/24 blur-3xl" />
+          <div className="pointer-events-none absolute -right-24 -top-24 size-80 rounded-full bg-[#F92D0A]/20 blur-3xl" />
+          <div className="grid items-center gap-6 md:grid-cols-[1fr_460px]">
+            <div className="space-y-5">
+              <p className="text-[1.95rem] leading-tight text-white/90">{heroTitle}</p>
+              <h1 className="text-5xl font-semibold leading-[1.05] md:text-6xl">Up to {heroDiscount}% off Voucher</h1>
               <Link
-                href={`/products/${heroProduct?.slug ?? ""}`}
-                className="inline-flex items-center gap-2 text-sm font-semibold underline"
+                href={`/products/${activeHeroProduct.slug}`}
+                className="inline-flex items-center gap-2 border-b border-white/80 pb-1 text-2xl font-medium transition hover:text-[#FB8500]"
               >
-                Shop Now <ArrowRight className="size-4" />
+                Shop Now <ArrowRight className="size-6" />
               </Link>
             </div>
-            <div className="relative h-52 md:h-64">
-              <Image
-                src={heroProduct?.imageUrl || "/assets/sections/hero-phone.svg"}
-                alt={heroProduct?.name || "Hero Product"}
-                fill
-                unoptimized
-                className="object-cover"
-              />
+            <div className="relative h-[330px] md:h-[460px]">
+              <Image src={heroImage} alt={activeHeroProduct.name} fill unoptimized className="object-contain" />
             </div>
           </div>
-          <div className="mt-6 flex justify-center gap-2">
-            <span className="size-2 rounded-full bg-white/40" />
-            <span className="size-2 rounded-full bg-[#F92D0A]" />
-            <span className="size-2 rounded-full bg-white/40" />
-            <span className="size-2 rounded-full bg-white/40" />
+          <div className="mt-2 flex items-center justify-center gap-2">
+            {Array.from({ length: heroPageCount }).map((_, idx) => (
+              <button
+                type="button"
+                key={idx}
+                aria-label={`Go to hero page ${idx + 1}`}
+                onClick={() => setHeroPage(idx)}
+                className={`size-2.5 rounded-full transition ${
+                  idx === safeHeroPage
+                    ? "bg-[#F92D0A] ring-2 ring-white/80"
+                    : "bg-white/45 hover:bg-white/80"
+                }`}
+              />
+            ))}
           </div>
         </div>
       </section>
 
-      <section id="flash-sales" className="glass-panel space-y-6 p-6">
+      <section className="glass-panel section-single-cart cart-right grid gap-3 p-5 sm:grid-cols-3 sm:p-6">
+        <StatPill label="Products Live" value={`${catalog.length}+`} />
+        <StatPill label="Hot Discounts" value={`${flashSale.length} Today`} />
+        <StatPill label="Top Rated Picks" value={`${bestSelling.length} Featured`} />
+      </section>
+
+      <section id="flash-sales" className="glass-panel space-y-6 p-6 md:p-8">
         <div className="flex items-center justify-between gap-4">
           <div className="space-y-2">
             <p className="section-tag">Today&apos;s</p>
             <h2 className="section-title">Flash Sales</h2>
           </div>
-          <div className="flex items-center gap-2">
-            <Link href="#hero" className="grid size-9 place-items-center rounded-full bg-[#f5f5f5] text-[#210E14]">
-              <ChevronLeft className="size-4" />
-            </Link>
-            <Link href="#categories" className="grid size-9 place-items-center rounded-full bg-[#f5f5f5] text-[#210E14]">
-              <ChevronRight className="size-4" />
+          <div className="text-right">
+            {loadingProducts ? <p className="text-sm text-[#748692]">Refreshing products...</p> : null}
+            <Link href="/categories/all" className="text-sm font-semibold text-[#F92D0A] hover:text-[#FB8500]">
+              See all deals
             </Link>
           </div>
         </div>
@@ -175,58 +240,38 @@ export default function HomePage() {
             <ProductCard key={item.id} product={item} />
           ))}
         </div>
-        <div className="text-center">
-          <Link href="/categories/all" className="lava-button inline-flex px-10 py-3">
-            View All Products
-          </Link>
-        </div>
       </section>
 
-      <section id="categories" className="glass-panel space-y-6 p-6">
-        <div className="flex items-center justify-between">
-          <div className="space-y-2">
-            <p className="section-tag">Categories</p>
-            <h2 className="section-title">Browse By Category</h2>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link href="#flash-sales" className="grid size-9 place-items-center rounded-full bg-[#f5f5f5] text-[#210E14]">
-              <ChevronLeft className="size-4" />
-            </Link>
-            <Link href="#best-selling" className="grid size-9 place-items-center rounded-full bg-[#f5f5f5] text-[#210E14]">
-              <ChevronRight className="size-4" />
-            </Link>
-          </div>
+      <section id="categories" className="glass-panel section-single-cart cart-right space-y-6 p-6 md:p-8">
+        <div className="space-y-2">
+          <p className="section-tag">Categories</p>
+          <h2 className="section-title">Browse By Category</h2>
         </div>
         <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
-          {categories.map((name, idx) => (
+          {heroCategories.slice(0, 6).map((category) => (
             <Link
-              href={`/categories/${toSlug(name)}`}
-              key={name}
-              className={`grid place-items-center gap-2 rounded border p-5 transition ${
-                idx === 3
-                  ? "border-[#F92D0A] bg-[#F92D0A] text-white"
-                  : "border-[#e5e7eb] bg-white text-[#210E14] hover:border-[#F92D0A]"
-              }`}
+              href={`/categories/${getHomeCategorySlug(category)}`}
+              key={category}
+              className="group rounded-xl border border-[#dae1ea] bg-white px-3 py-4 text-[#210E14] shadow-[0_16px_26px_-20px_rgba(33,14,20,0.65)] transition hover:-translate-y-0.5 hover:border-[#F92D0A]/45 hover:bg-[#FB8500]/5"
             >
-              {idx === 0 ? <Smartphone /> : null}
-              {idx === 1 ? <Laptop /> : null}
-              {idx === 2 ? <Smartphone /> : null}
-              {idx === 3 ? <Camera /> : null}
-              {idx === 4 ? <Headphones /> : null}
-              {idx === 5 ? <Gamepad2 /> : null}
-              <span className="text-sm font-medium">{name}</span>
+              <span className="mb-2 inline-flex size-9 items-center justify-center rounded-full bg-[#F4F6FA] text-[#28323F] transition group-hover:bg-[#FB8500]/15 group-hover:text-[#F92D0A]">
+                {categoryIcon(category)}
+              </span>
+              <p className="text-sm font-semibold">{formatCategory(category)}</p>
             </Link>
           ))}
         </div>
       </section>
 
-      <section id="best-selling" className="glass-panel space-y-6 p-6">
-        <div className="flex items-center justify-between">
+      <section id="best-selling" className="glass-panel section-single-cart cart-left space-y-6 p-6 md:p-8">
+        <div className="flex items-center justify-between gap-4">
           <div className="space-y-2">
-            <p className="section-tag">This Month</p>
+            <p className="section-tag">Top Rated</p>
             <h2 className="section-title">Best Selling Products</h2>
           </div>
-          <Link href="/categories/all" className="lava-button inline-flex px-8 py-3">View All</Link>
+          <Link href="/categories/all" className="lava-button inline-flex px-7 py-3">
+            View All
+          </Link>
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {bestSelling.map((item) => (
@@ -235,142 +280,107 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="overflow-hidden rounded-2xl bg-[#210E14] px-8 py-10 text-white shadow-[0_20px_50px_-30px_rgba(33,14,20,0.8)] md:px-12">
-        <div className="grid gap-8 md:grid-cols-2 md:items-center">
+      <section className="section-single-cart cart-right relative overflow-hidden rounded-2xl border border-[#3e4a5b] bg-[#210E14] px-7 py-9 text-white shadow-[0_32px_46px_-30px_rgba(33,14,20,0.95)] md:px-12 md:py-10">
+        <div className="relative grid gap-8 md:grid-cols-2 md:items-center">
           <div className="space-y-4">
-            <p className="text-sm text-[#8EB4C2]">Categories</p>
-            <h2 className="text-5xl font-semibold leading-tight">Enhance Your Music Experience</h2>
-            <div className="flex gap-3 text-black">
-              {["23", "05", "59", "35"].map((v) => (
-                <div key={v} className="grid size-14 place-items-center rounded-full bg-white text-sm font-semibold">
-                  {v}
-                </div>
-              ))}
-            </div>
-            <Link href={`/products/${promoProduct?.slug ?? ""}`} className="lava-button inline-flex px-8 py-3">
-              Buy Now!
+            <p className="text-sm font-semibold uppercase tracking-wide text-[#FB8500]">Featured Product</p>
+            <h2 className="text-4xl font-semibold leading-tight md:text-5xl">{promoProduct.name}</h2>
+            <p className="max-w-md text-sm text-white/80">{promoProduct.description}</p>
+            <Link href={`/products/${promoProduct.slug}`} className="lava-button inline-flex px-8 py-3">
+              Buy Now
             </Link>
           </div>
-          <div className="relative h-56 md:h-72">
-            <Image
-              src={promoProduct?.imageUrl || "/assets/sections/music-speaker.svg"}
-              alt={promoProduct?.name || "Promo Product"}
-              fill
-              unoptimized
-              className="object-cover"
-            />
+          <div className="relative h-60 overflow-hidden rounded-xl border border-white/25 md:h-72">
+            <Image src={promoProduct.imageUrl} alt={promoProduct.name} fill unoptimized className="object-cover" />
           </div>
         </div>
       </section>
 
-      <section id="explore-products" className="glass-panel space-y-6 p-6">
-        <div className="flex items-center justify-between">
+      <section id="explore-products" className="glass-panel section-single-cart cart-left space-y-6 p-6 md:p-8">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-2">
             <p className="section-tag">Our Products</p>
             <h2 className="section-title">Explore Our Products</h2>
           </div>
           <div className="flex items-center gap-2">
-            <Link href="#best-selling" className="grid size-9 place-items-center rounded-full bg-[#f5f5f5] text-[#210E14]">
+            <button
+              type="button"
+              aria-label="Previous explore page"
+              onClick={() => setExplorePage((prev) => (prev - 1 + explorePageCount) % explorePageCount)}
+              className="grid size-9 place-items-center rounded-full border border-[#dce3ea] bg-white text-[#210E14] transition hover:border-[#FB8500] hover:text-[#F92D0A]"
+            >
               <ChevronLeft className="size-4" />
-            </Link>
-            <Link href="#featured" className="grid size-9 place-items-center rounded-full bg-[#f5f5f5] text-[#210E14]">
+            </button>
+            {Array.from({ length: explorePageCount }).map((_, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => setExplorePage(idx)}
+                className={`grid size-9 place-items-center rounded-full border text-xs font-semibold transition ${
+                  idx === safeExplorePage
+                    ? "border-[#F92D0A] bg-[#F92D0A] text-white"
+                    : "border-[#dce3ea] bg-white text-[#210E14] hover:border-[#FB8500] hover:text-[#F92D0A]"
+                }`}
+              >
+                {idx + 1}
+              </button>
+            ))}
+            <button
+              type="button"
+              aria-label="Next explore page"
+              onClick={() => setExplorePage((prev) => (prev + 1) % explorePageCount)}
+              className="grid size-9 place-items-center rounded-full border border-[#dce3ea] bg-white text-[#210E14] transition hover:border-[#FB8500] hover:text-[#F92D0A]"
+            >
               <ChevronRight className="size-4" />
-            </Link>
+            </button>
           </div>
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {explore.map((item, idx) => (
-            <ProductCard key={`${item.id}-${idx}`} product={item} />
+          {activeExplore.map((item) => (
+            <ProductCard key={item.id} product={item} />
           ))}
         </div>
       </section>
 
-      <section id="featured" className="glass-panel space-y-6 p-6">
+      <section id="featured" className="glass-panel section-single-cart cart-right space-y-6 p-6 md:p-8">
         <div className="space-y-2">
-          <p className="section-tag">Featured</p>
-          <h2 className="section-title">New Arrival</h2>
+          <p className="section-tag">New Arrival</p>
+          <h2 className="section-title">Fresh In Store</h2>
         </div>
-        <div className="grid gap-6 lg:grid-cols-2">
-          <div className="group relative min-h-[460px] overflow-hidden rounded-xl bg-black p-6 text-white">
-            <Image
-              src={featuredMain.imageUrl || "/assets/sections/featured-playstation.svg"}
-              alt={featuredMain.name}
-              fill
-              unoptimized
-              className="object-cover opacity-80 transition duration-500 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#210E14]/90 via-[#210E14]/40 to-transparent" />
-            <div className="absolute bottom-6 left-6 z-10 space-y-2">
-              <h3 className="font-display text-5xl font-semibold leading-none">{featuredMain.name}</h3>
-              <p className="max-w-sm text-sm text-zinc-200">
-                Premium quality launch drop with limited-time pricing.
-              </p>
-              <Link href={`/products/${featuredMain.slug}`} className="text-sm font-semibold underline">
-                Shop Now
-              </Link>
-            </div>
-          </div>
-
-          <div className="grid gap-6">
-            <div className="group relative min-h-[210px] overflow-hidden rounded-xl bg-black p-6 text-white">
-              <Image
-                src={featuredTopRight.imageUrl || "/assets/sections/featured-women.svg"}
-                alt={featuredTopRight.name}
-                fill
-                unoptimized
-                className="object-cover opacity-80 transition duration-500 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-[#210E14]/85 via-[#210E14]/35 to-transparent" />
-              <div className="absolute bottom-6 left-6 z-10 space-y-2">
-                <h3 className="font-display text-4xl font-semibold leading-none">
-                  {featuredTopRight.name}
-                </h3>
-                <p className="text-sm text-zinc-200">
-                  Featured collection crafted for standout style and utility.
-                </p>
-                <Link href={`/products/${featuredTopRight.slug}`} className="text-sm font-semibold underline">
-                  Shop Now
-                </Link>
-              </div>
-            </div>
-            <div className="grid gap-6 sm:grid-cols-2">
-              <SmallFeature
-                title={featuredBottomLeft.name}
-                image={featuredBottomLeft.imageUrl || "/assets/sections/featured-speakers.svg"}
-                slug={featuredBottomLeft.slug}
-              />
-              <SmallFeature
-                title={featuredBottomRight.name}
-                image={featuredBottomRight.imageUrl || "/assets/sections/featured-perfume.svg"}
-                slug={featuredBottomRight.slug}
-              />
-            </div>
-          </div>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {featured.map((item) => (
+            <ProductCard key={item.id} product={item} />
+          ))}
         </div>
       </section>
 
-      <section id="support" className="glass-panel grid gap-8 p-8 text-center md:grid-cols-3">
+      <section id="support" className="glass-panel section-single-cart cart-left grid gap-8 p-8 text-center md:grid-cols-3">
         <FeatureIcon icon={<Truck className="size-5" />} title="FREE AND FAST DELIVERY" copy="Free delivery for all orders over $140" />
-        <FeatureIcon icon={<Headset className="size-5" />} title="24/7 CUSTOMER SERVICE" copy="Friendly 24/7 customer support" />
-        <FeatureIcon icon={<ShieldCheck className="size-5" />} title="MONEY BACK GUARANTEE" copy="We return money within 30 days" />
+        <FeatureIcon icon={<ShieldCheck className="size-5" />} title="SECURE CHECKOUT" copy="Protected payment and trusted fulfillment" />
+        <FeatureIcon icon={<Headphones className="size-5" />} title="24/7 CUSTOMER SUPPORT" copy="Always available when you need help" />
       </section>
     </div>
   );
 }
 
-function SmallFeature({ title, image, slug }: { title: string; image: string; slug: string }) {
+function StatPill({ label, value }: { label: string; value: string }) {
   return (
-    <div className="group relative min-h-[220px] overflow-hidden rounded-xl bg-black p-5 text-white">
-      <Image src={image} alt={title} fill unoptimized className="object-cover opacity-80" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#210E14]/85 via-[#210E14]/35 to-transparent" />
-      <div className="absolute bottom-5 left-5 z-10 space-y-2">
-        <h4 className="font-display text-4xl font-semibold leading-none">{title}</h4>
-        <Link href={`/products/${slug}`} className="text-sm font-semibold underline">
-          Shop Now
-        </Link>
-      </div>
+    <div className="rounded-xl border border-white/60 bg-white/90 px-4 py-3 shadow-[0_16px_24px_-20px_rgba(33,14,20,0.7)]">
+      <p className="text-xs font-semibold uppercase tracking-wide text-[#712825]">{label}</p>
+      <p className="mt-1 text-lg font-semibold text-[#210E14]">{value}</p>
     </div>
   );
+}
+
+function categoryIcon(category: string) {
+  const value = category.toLowerCase();
+  if (value.includes("phone")) return <Smartphone className="size-5" />;
+  if (value.includes("laptop") || value.includes("computer")) return <Laptop className="size-5" />;
+  if (value.includes("watch")) return <Watch className="size-5" />;
+  if (value.includes("camera")) return <Camera className="size-5" />;
+  if (value.includes("audio") || value.includes("head")) return <Headphones className="size-5" />;
+  if (value.includes("gaming") || value.includes("game")) return <Gamepad2 className="size-5" />;
+  return <ChevronRight className="size-5" />;
 }
 
 function FeatureIcon({ icon, title, copy }: { icon: ReactNode; title: string; copy: string }) {
@@ -383,10 +393,33 @@ function FeatureIcon({ icon, title, copy }: { icon: ReactNode; title: string; co
   );
 }
 
-function toSlug(value: string) {
-  return value
-    .toLowerCase()
-    .replaceAll("&", "and")
-    .replaceAll("'", "")
-    .replaceAll(/\s+/g, "-");
+function getHeroTopLabel(name: string) {
+  if (name.toLowerCase().includes("iphone 14")) return "iPhone 14 Series";
+  return name;
+}
+
+function getHeroImageForProduct(name: string, fallbackImage: string) {
+  if (name.toLowerCase().includes("iphone 14")) {
+    return "https://images.unsplash.com/photo-1663499482523-8f4fc78f7f5d?q=80&w=1200&auto=format&fit=crop";
+  }
+  return fallbackImage;
+}
+
+function normalizeName(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function getHomeCategorySlug(label: string) {
+  const map: Record<string, string> = {
+    "Woman's Fashion": "womans-fashion",
+    "Men's Fashion": "mens-fashion",
+    Electronics: "electronics",
+    "Home & Lifestyle": "home-and-lifestyle",
+    Medicine: "medicine",
+    "Sports & Outdoor": "sports-and-outdoor",
+    "Baby's & Toys": "babys-and-toys",
+    "Groceries & Pets": "groceries-and-pets",
+    "Health & Beauty": "health-and-beauty"
+  };
+  return map[label] ?? toCategorySlug(label);
 }

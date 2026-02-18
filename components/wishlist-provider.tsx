@@ -14,7 +14,28 @@ type WishlistContextType = {
 
 const WishlistContext = createContext<WishlistContextType | null>(null);
 const STORAGE_KEY = "stackstore_wishlist_v1";
-const DEFAULT_IDS = ["1", "2", "3", "4"];
+const DEFAULT_IDS: string[] = [];
+
+function normalizeId(id: string | number) {
+  return String(id).trim();
+}
+
+function normalizeIds(input: unknown): string[] {
+  if (!Array.isArray(input)) return [];
+  const normalized = input
+    .map((item) => {
+      if (typeof item === "string" || typeof item === "number") return normalizeId(item);
+      if (item && typeof item === "object" && "id" in item) {
+        const record = item as { id?: unknown };
+        if (typeof record.id === "string" || typeof record.id === "number") {
+          return normalizeId(record.id);
+        }
+      }
+      return "";
+    })
+    .filter(Boolean);
+  return Array.from(new Set(normalized));
+}
 
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const [ids, setIds] = useState<string[]>(DEFAULT_IDS);
@@ -24,7 +45,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
     if (!raw) return;
     try {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) setIds(parsed);
+      setIds(normalizeIds(parsed));
     } catch {
       setIds(DEFAULT_IDS);
     }
@@ -39,16 +60,19 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       ids,
       count: ids.length,
       has(id: string) {
-        return ids.includes(id);
+        return ids.includes(normalizeId(id));
       },
       add(id: string) {
-        setIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+        const nextId = normalizeId(id);
+        setIds((prev) => (prev.includes(nextId) ? prev : [...prev, nextId]));
       },
       remove(id: string) {
-        setIds((prev) => prev.filter((v) => v !== id));
+        const nextId = normalizeId(id);
+        setIds((prev) => prev.filter((v) => v !== nextId));
       },
       toggle(id: string) {
-        setIds((prev) => (prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]));
+        const nextId = normalizeId(id);
+        setIds((prev) => (prev.includes(nextId) ? prev.filter((v) => v !== nextId) : [...prev, nextId]));
       },
       clear() {
         setIds([]);

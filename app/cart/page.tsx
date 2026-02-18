@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { Trash2 } from "lucide-react";
@@ -14,7 +14,7 @@ export default function CartPage() {
     <div className="space-y-10 pb-8">
       <p className="text-sm text-zinc-500">Home / <span className="text-[#210E14]">Cart</span></p>
 
-      <div className="overflow-hidden rounded border border-[#e5e7eb] bg-white">
+      <div className="glass-panel overflow-hidden rounded border border-[#e5e7eb]">
         <table className="w-full text-left">
           <thead className="border-b border-[#e5e7eb] text-sm">
             <tr className="text-[#210E14]">
@@ -28,12 +28,12 @@ export default function CartPage() {
           <tbody>
             {cart.items.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-6 py-10 text-center text-zinc-500">
+                <td colSpan={5} className="px-6 py-10 text-center text-zinc-500">
                   Your cart is empty. Add products from the shop.
                 </td>
               </tr>
             ) : (
-                cart.items.map((item) => (
+              cart.items.map((item) => (
                 <tr key={item.productId} className="border-b border-[#f1f1f1] text-[#210E14]">
                   <td className="px-6 py-5">
                     <div className="flex items-center gap-3">
@@ -52,16 +52,14 @@ export default function CartPage() {
                       <span className="font-medium">{item.name}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-5">${item.price}</td>
+                  <td className="px-6 py-5 font-medium">${item.price.toFixed(2)}</td>
                   <td className="px-6 py-5">
                     <Input
                       type="number"
                       min={1}
                       className="w-24"
                       value={item.quantity}
-                      onChange={(e) =>
-                        cart.updateQuantity(item.productId, Number(e.target.value || 1))
-                      }
+                      onChange={(e) => cart.updateQuantity(item.productId, Number(e.target.value || 1))}
                     />
                   </td>
                   <td className="px-6 py-5 text-right font-medium">
@@ -70,7 +68,7 @@ export default function CartPage() {
                   <td className="px-6 py-5 text-center">
                     <button
                       onClick={() => cart.removeItem(item.productId)}
-                      className="inline-flex items-center justify-center rounded bg-white border border-[#e5e7eb] p-2 hover:bg-[#F92D0A] hover:text-white transition"
+                      className="inline-flex items-center justify-center rounded border border-[#e5e7eb] bg-white p-2 transition hover:border-[#F92D0A] hover:bg-[#F92D0A] hover:text-white"
                       aria-label="Remove item"
                     >
                       <Trash2 className="size-4" />
@@ -87,7 +85,15 @@ export default function CartPage() {
         <Link href="/">
           <Button variant="outline" className="h-12 px-8 normal-case tracking-normal">Return To Shop</Button>
         </Link>
-        <Button variant="outline" className="h-12 px-8 normal-case tracking-normal">Update Cart</Button>
+        <Button
+          variant="outline"
+          className="h-12 px-8 normal-case tracking-normal"
+          onClick={() => {
+            cart.items.forEach((item) => cart.updateQuantity(item.productId, Math.max(1, item.quantity)));
+          }}
+        >
+          Update Cart
+        </Button>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-2">
@@ -107,13 +113,13 @@ export default function CartPage() {
               <span>Shipping:</span>
               <span>Free</span>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between text-lg font-semibold">
               <span>Total:</span>
               <span>${cart.total.toFixed(2)}</span>
             </div>
           </div>
           <Link href="/checkout" className="mt-6 inline-block">
-            <Button className="h-12 px-10 normal-case tracking-normal">Proceeds to checkout</Button>
+            <Button className="h-12 px-10 normal-case tracking-normal">Proceed to checkout</Button>
           </Link>
         </div>
       </div>

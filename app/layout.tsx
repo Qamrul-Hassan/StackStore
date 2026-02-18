@@ -30,8 +30,7 @@ export default function RootLayout({
       <body suppressHydrationWarning className={`${outfit.variable} ${syne.variable}`}>
         <Providers>
           <SiteHeader />
-          <main className="relative mx-auto max-w-6xl px-4 py-8 md:px-6">
-            <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-80 bg-[radial-gradient(circle_at_50%_0%,rgba(251,133,0,0.18),rgba(249,45,10,0.06)_42%,transparent_70%)]" />
+          <main className="relative main-cart-bg mx-auto max-w-6xl px-4 pb-8 pt-0 md:px-6">
             {children}
           </main>
           <SiteFooter />
