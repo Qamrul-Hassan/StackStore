@@ -3,16 +3,23 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
+  Armchair,
   ArrowRight,
   Camera,
   ChevronLeft,
   ChevronRight,
+  Flower2,
   Gamepad2,
+  Gem,
   Headphones,
+  Home,
   Laptop,
+  ShoppingBasket,
+  Shirt,
   ShieldCheck,
   Smartphone,
   Truck,
+  UtensilsCrossed,
   Watch
 } from "lucide-react";
 import { ReactNode, useEffect, useMemo, useState } from "react";
@@ -165,7 +172,7 @@ export default function HomePage() {
   return (
     <div className="space-y-10 pb-12 pt-4 md:space-y-12 md:pt-6 lg:space-y-14 lg:pt-8">
       <section id="hero" className="section-single-cart cart-left mt-0 grid gap-4 lg:grid-cols-[265px_1fr] lg:items-stretch lg:gap-6">
-        <aside className="glass-panel hidden h-full p-5 lg:flex lg:h-[500px] lg:flex-col">
+        <aside className="glass-panel section-shell hidden h-full p-5 lg:flex lg:h-[500px] lg:flex-col">
           <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-[#712825]">Shop Categories</p>
           <ul className="no-scrollbar flex-1 space-y-2 overflow-auto pr-1 text-sm text-[#210E14]">
             {homeCategoryLinks.map((category) => (
@@ -182,7 +189,7 @@ export default function HomePage() {
           </ul>
         </aside>
 
-        <div className="relative overflow-hidden rounded-2xl border border-[#344154] bg-gradient-to-r from-[#210E14] via-[#28323F] to-[#210E14] px-4 pb-4 pt-4 text-white shadow-[0_40px_62px_-38px_rgba(33,14,20,0.95)] sm:px-6 sm:pb-5 sm:pt-5 md:px-9 md:pb-6 md:pt-6 lg:flex lg:h-[500px] lg:flex-col">
+        <div className="section-shell relative overflow-hidden rounded-2xl border border-[#344154] bg-gradient-to-r from-[#210E14] via-[#28323F] to-[#210E14] px-4 pb-4 pt-4 text-white shadow-[0_40px_62px_-38px_rgba(33,14,20,0.95)] sm:px-6 sm:pb-5 sm:pt-5 md:px-9 md:pb-6 md:pt-6 lg:flex lg:h-[500px] lg:flex-col">
           <div className="pointer-events-none absolute -left-20 top-1/2 size-72 -translate-y-1/2 rounded-full bg-[#FB8500]/24 blur-3xl" />
           <div className="pointer-events-none absolute -right-24 -top-24 size-80 rounded-full bg-[#F92D0A]/20 blur-3xl" />
           <div className="grid items-center gap-4 sm:gap-5 md:grid-cols-[1fr_390px] lg:flex-1">
@@ -218,13 +225,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="glass-panel section-single-cart cart-right grid gap-3 p-5 sm:grid-cols-3 sm:p-6">
+      <section className="glass-panel section-shell section-single-cart cart-right grid gap-3 p-5 sm:grid-cols-3 sm:p-6">
         <StatPill label="Products Live" value={`${catalog.length}+`} />
         <StatPill label="Hot Discounts" value={`${flashSale.length} Today`} />
         <StatPill label="Top Rated Picks" value={`${bestSelling.length} Featured`} />
       </section>
 
-      <section id="flash-sales" className="glass-panel space-y-6 p-5 sm:p-6 md:p-8">
+      <section id="flash-sales" className="glass-panel section-shell space-y-6 p-5 sm:p-6 md:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-2">
             <p className="section-tag">Today&apos;s</p>
@@ -244,7 +251,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="categories" className="glass-panel section-single-cart cart-left space-y-6 p-5 sm:p-6 md:p-8">
+      <section id="categories" className="glass-panel section-shell section-single-cart cart-left space-y-6 p-5 sm:p-6 md:p-8">
         <div className="space-y-2">
           <p className="section-tag">Categories</p>
           <h2 className="section-title">Browse By Category ({allCategories.length})</h2>
@@ -265,7 +272,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="best-selling" className="glass-panel section-single-cart cart-right space-y-6 p-5 sm:p-6 md:p-8">
+      <section id="best-selling" className="glass-panel section-shell section-single-cart cart-right space-y-6 p-5 sm:p-6 md:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4 sm:items-center">
           <div className="space-y-2">
             <p className="section-tag">Top Rated</p>
@@ -282,7 +289,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="relative overflow-hidden rounded-2xl border border-[#3e4a5b] bg-[#210E14] px-5 py-7 text-white shadow-[0_32px_46px_-30px_rgba(33,14,20,0.95)] sm:px-7 sm:py-9 md:px-12 md:py-10">
+      <section className="section-shell relative overflow-hidden rounded-2xl border border-[#3e4a5b] bg-[#210E14] px-5 py-7 text-white shadow-[0_32px_46px_-30px_rgba(33,14,20,0.95)] sm:px-7 sm:py-9 md:px-12 md:py-10">
         <div className="relative grid gap-8 md:grid-cols-2 md:items-center">
           <div className="space-y-4">
             <p className="text-sm font-semibold uppercase tracking-wide text-[#FB8500]">Featured Product</p>
@@ -298,7 +305,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="explore-products" className="glass-panel section-single-cart cart-left space-y-6 p-5 sm:p-6 md:p-8">
+      <section id="explore-products" className="glass-panel section-shell section-single-cart cart-left space-y-6 p-5 sm:p-6 md:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-2">
             <p className="section-tag">Our Products</p>
@@ -344,7 +351,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="featured" className="glass-panel section-single-cart cart-right space-y-6 p-5 sm:p-6 md:p-8">
+      <section id="featured" className="glass-panel section-shell section-single-cart cart-right space-y-6 p-5 sm:p-6 md:p-8">
         <div className="space-y-2">
           <p className="section-tag">New Arrival</p>
           <h2 className="section-title">Fresh In Store</h2>
@@ -356,7 +363,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="support" className="glass-panel section-single-cart cart-left grid gap-6 p-6 text-center sm:p-8 md:grid-cols-3">
+      <section id="support" className="glass-panel section-shell section-single-cart cart-left grid gap-6 p-6 text-center sm:p-8 md:grid-cols-3">
         <FeatureIcon icon={<Truck className="size-5" />} title="FREE AND FAST DELIVERY" copy="Free delivery for all orders over $140" />
         <FeatureIcon icon={<ShieldCheck className="size-5" />} title="SECURE CHECKOUT" copy="Protected payment and trusted fulfillment" />
         <FeatureIcon icon={<Headphones className="size-5" />} title="24/7 CUSTOMER SUPPORT" copy="Always available when you need help" />
@@ -376,13 +383,23 @@ function StatPill({ label, value }: { label: string; value: string }) {
 
 function categoryIcon(category: string) {
   const value = category.toLowerCase();
+  if (value.includes("women")) return <ShoppingBasket className="size-5" />;
+  if (value.includes("beauty") || value.includes("skin")) return <Flower2 className="size-5" />;
+  if (value.includes("fragrance")) return <Gem className="size-5" />;
+  if (value.includes("furniture")) return <Armchair className="size-5" />;
+  if (value.includes("grocer")) return <ShoppingBasket className="size-5" />;
+  if (value.includes("home decor")) return <Home className="size-5" />;
+  if (value.includes("kitchen")) return <UtensilsCrossed className="size-5" />;
+  if (value.includes("shirt") || value.includes("tops")) return <Shirt className="size-5" />;
+  if (value.includes("shoe")) return <Shirt className="size-5" />;
+  if (value.includes("mobile accessories")) return <Smartphone className="size-5" />;
   if (value.includes("phone")) return <Smartphone className="size-5" />;
   if (value.includes("laptop") || value.includes("computer")) return <Laptop className="size-5" />;
   if (value.includes("watch")) return <Watch className="size-5" />;
   if (value.includes("camera")) return <Camera className="size-5" />;
   if (value.includes("audio") || value.includes("head")) return <Headphones className="size-5" />;
   if (value.includes("gaming") || value.includes("game")) return <Gamepad2 className="size-5" />;
-  return <ChevronRight className="size-5" />;
+  return <ShoppingBasket className="size-5" />;
 }
 
 function FeatureIcon({ icon, title, copy }: { icon: ReactNode; title: string; copy: string }) {

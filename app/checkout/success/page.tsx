@@ -9,7 +9,7 @@ export default async function CheckoutSuccessPage({
   const { orderId } = await searchParams;
 
   return (
-    <div className="mx-auto max-w-xl">
+    <div className="section-single-cart cart-right mx-auto max-w-xl">
       <Card>
         <CardHeader>
           <CardTitle>Order Received</CardTitle>

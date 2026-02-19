@@ -65,7 +65,7 @@ export default async function CategoryPage({
         Home / Categories / <span className="text-[#210E14]">{pageTitle}</span>
       </p>
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="section-single-cart cart-right flex flex-wrap items-center gap-2">
         <Link href="/categories/all" className="rounded-md border border-[#dce3ea] bg-white px-3 py-1.5 text-sm text-[#210E14] hover:border-[#F92D0A] hover:text-[#F92D0A]">
           All
         </Link>
@@ -92,11 +92,11 @@ export default async function CategoryPage({
       <h1 className="section-title !text-white">{pageTitle}</h1>
 
       {sortedItems.length === 0 ? (
-        <div className="glass-panel p-8 text-sm text-zinc-600">
+        <div className="glass-panel section-single-cart cart-left p-8 text-sm text-zinc-600">
           Products for this category are coming soon.
         </div>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="section-single-cart cart-left grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {sortedItems.map((item) => (
             <ProductCard key={item.id} product={item} />
           ))}

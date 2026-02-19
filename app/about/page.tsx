@@ -22,7 +22,7 @@ export default function AboutPage() {
         Home / <span className="font-semibold text-white">About</span>
       </p>
 
-      <section className="grid gap-10 lg:grid-cols-2 lg:items-center">
+      <section className="section-single-cart cart-left grid gap-10 lg:grid-cols-2 lg:items-center">
         <div className="space-y-5">
           <p className="inline-flex items-center gap-2 rounded-full border border-[#FB8500]/50 bg-[#FB8500]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#FB8500]">
             About Exclusive
@@ -54,14 +54,14 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="grid gap-6 md:grid-cols-4">
+      <section className="section-single-cart cart-right grid gap-6 md:grid-cols-4">
         <MetricBox icon={<Users className="size-5" />} title={10.5} suffix="k" copy="Sellers active our site" />
         <MetricBox icon={<ShoppingBag className="size-5" />} title={33} suffix="k" copy="Monthly Product Sale" active />
         <MetricBox icon={<Users className="size-5" />} title={45.5} suffix="k" copy="Customer active in our site" />
         <MetricBox icon={<BarChart3 className="size-5" />} title={25} suffix="k" copy="Annual gross sale in our site" />
       </section>
 
-      <section className="grid gap-6 md:grid-cols-3">
+      <section className="section-single-cart cart-left grid gap-6 md:grid-cols-3">
         <TeamCard
           name="Tom Cruise"
           role="Founder & Chairman"
@@ -79,7 +79,7 @@ export default function AboutPage() {
         />
       </section>
 
-      <section className="grid gap-8 border-t border-white/25 pt-12 text-center md:grid-cols-3">
+      <section className="section-single-cart cart-right grid gap-8 border-t border-white/25 pt-12 text-center md:grid-cols-3">
         <SupportCard
           icon={<Truck className="size-5" />}
           title="FREE AND FAST DELIVERY"

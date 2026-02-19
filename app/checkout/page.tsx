@@ -53,7 +53,7 @@ export default function CheckoutPage() {
         Account / My Account / Product / View Cart / <span className="text-[#210E14]">CheckOut</span>
       </p>
 
-      <form className="grid gap-10 lg:grid-cols-[1fr_0.9fr]" onSubmit={onSubmit}>
+      <form className="section-single-cart cart-left grid gap-10 lg:grid-cols-[1fr_0.9fr]" onSubmit={onSubmit}>
         <div className="space-y-5">
           <h1 className="text-5xl font-semibold text-[#210E14]">Billing Details</h1>
           <Field label="First Name*" />

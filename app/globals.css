@@ -93,6 +93,13 @@ body {
     inset 0 1px 0 rgba(255, 255, 255, 0.68);
 }
 
+.section-shell {
+  box-shadow:
+    0 40px 64px -42px rgba(33, 14, 20, 0.95),
+    0 18px 34px -24px rgba(40, 50, 63, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
 .on-dark {
   color: #f4f7fb;
 }

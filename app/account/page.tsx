@@ -13,7 +13,7 @@ export default function AccountPage() {
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[220px_1fr]">
-        <aside className="space-y-6">
+        <aside className="section-single-cart cart-left space-y-6">
           <div className="space-y-2">
             <h3 className="text-xl font-semibold text-[#210E14]">Manage My Account</h3>
             <p className="pl-4 text-[#F92D0A]">My Profile</p>
@@ -28,7 +28,7 @@ export default function AccountPage() {
           <h3 className="text-xl font-semibold text-[#210E14]">My WishList</h3>
         </aside>
 
-        <div className="rounded border border-[#e5e7eb] bg-white p-8">
+        <div className="section-single-cart cart-right rounded border border-[#e5e7eb] bg-white p-8">
           <h2 className="text-4xl font-semibold text-[#F92D0A]">Edit Your Profile</h2>
           <div className="mt-6 grid gap-5 md:grid-cols-2">
             <Field label="First Name" value="Md" />

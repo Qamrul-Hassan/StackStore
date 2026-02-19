@@ -29,20 +29,22 @@ export default async function ProductDetailsPage({
         Home / {formatCategory(product.category)} / <span className="text-[#210E14]">{product.name}</span>
       </p>
 
-      <ProductDetailsInteractive
-        product={{
-          id: product.id,
-          name: product.name,
-          price: product.price,
-          imageUrl: product.imageUrl
-        }}
-        description={description}
-        reviews={product.reviews}
-        gallery={product.images}
-        optionGroups={getOptionGroups(product.category)}
-      />
+      <div className="section-single-cart cart-left">
+        <ProductDetailsInteractive
+          product={{
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            imageUrl: product.imageUrl
+          }}
+          description={description}
+          reviews={product.reviews}
+          gallery={product.images}
+          optionGroups={getOptionGroups(product.category)}
+        />
+      </div>
 
-      <section className="space-y-6">
+      <section className="section-single-cart cart-right space-y-6">
         <p className="section-tag">Related Item</p>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {related.map((item) => (

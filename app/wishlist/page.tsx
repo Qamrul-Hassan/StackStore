@@ -43,11 +43,11 @@ export default function WishlistPage() {
       </div>
 
       {list.length === 0 ? (
-        <div className="glass-panel rounded border border-dashed border-[#d1d5db] p-10 text-center text-zinc-500">
+        <div className="glass-panel section-single-cart cart-left rounded border border-dashed border-[#d1d5db] p-10 text-center text-zinc-500">
           Your wishlist is empty.
         </div>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="section-single-cart cart-left grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {list.map((item) => (
             <ProductCard
               key={item.id}
@@ -71,7 +71,7 @@ export default function WishlistPage() {
         </button>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="section-single-cart cart-right grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {justForYou.map((item) => (
           <ProductCard key={item.id} product={item} />
         ))}

@@ -14,7 +14,7 @@ export default function CartPage() {
     <div className="space-y-10 pb-8">
       <p className="text-sm text-zinc-500">Home / <span className="text-[#210E14]">Cart</span></p>
 
-      <div className="glass-panel overflow-hidden rounded border border-[#e5e7eb]">
+      <div className="glass-panel section-single-cart cart-left overflow-hidden rounded border border-[#e5e7eb]">
         <table className="w-full text-left">
           <thead className="border-b border-[#e5e7eb] text-sm">
             <tr className="text-[#210E14]">
@@ -96,7 +96,7 @@ export default function CartPage() {
         </Button>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="section-single-cart cart-right grid gap-8 lg:grid-cols-2">
         <div className="flex gap-3">
           <Input className="h-12" placeholder="Coupon Code" />
           <Button className="h-12 px-8 normal-case tracking-normal">Apply Coupon</Button>

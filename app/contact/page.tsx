@@ -9,7 +9,7 @@ export default function ContactPage() {
       </p>
 
       <div className="grid gap-8 lg:grid-cols-[340px_1fr]">
-        <div className="rounded border border-[#e5e7eb] bg-white p-8">
+        <div className="section-single-cart cart-left rounded border border-[#e5e7eb] bg-white p-8">
           <div className="space-y-3 border-b border-[#e5e7eb] pb-8">
             <p className="flex items-center gap-3 text-2xl font-semibold text-[#210E14]">
               <span className="icon-circle bg-[#F92D0A]">
@@ -34,7 +34,7 @@ export default function ContactPage() {
           </div>
         </div>
 
-        <form className="rounded border border-[#e5e7eb] bg-white p-8">
+        <form className="section-single-cart cart-right rounded border border-[#e5e7eb] bg-white p-8">
           <div className="grid gap-4 md:grid-cols-3">
             <Input className="h-12 bg-[#f5f5f5]" placeholder="Your Name *" />
             <Input className="h-12 bg-[#f5f5f5]" placeholder="Your Email *" />

@@ -23,7 +23,7 @@ export function SiteHeader() {
   const cartCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[#d2d8df] bg-white/85 shadow-[0_18px_40px_-26px_rgba(33,14,20,0.88)] backdrop-blur-lg">
+    <header className="fixed inset-x-0 top-0 z-[70] border-b border-[#d2d8df] bg-white/85 shadow-[0_18px_40px_-26px_rgba(33,14,20,0.88)] backdrop-blur-lg">
       <div className="bg-gradient-to-r from-[#210E14] via-[#28323F] to-[#210E14] text-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-3 py-2 text-[10px] sm:px-4 sm:text-[11px] md:px-6">
           <p className="w-full text-center leading-tight md:w-auto">
