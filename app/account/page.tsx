@@ -8,7 +8,7 @@ export default function AccountPage() {
           Home / <span className="font-semibold text-white">My Account</span>
         </p>
         <p className="text-sm text-zinc-200">
-          Welcome! <span className="font-semibold text-[#FB8500]">Md Rimel</span>
+          Welcome! <span className="font-semibold text-[#FB8500]">Qamrul Hassan</span>
         </p>
       </div>
 
@@ -31,9 +31,9 @@ export default function AccountPage() {
         <div className="glass-panel section-shell section-single-cart cart-right rounded-2xl p-8">
           <h2 className="text-4xl font-semibold text-[#F92D0A]">Edit Your Profile</h2>
           <div className="mt-6 grid gap-5 md:grid-cols-2">
-            <Field label="First Name" value="Md" />
-            <Field label="Last Name" value="Rimel" />
-            <Field label="Email" value="rimell111@gmail.com" />
+            <Field label="First Name" value="Qamrul" />
+            <Field label="Last Name" value="Hassan" />
+            <Field label="Email" value="mdqamrul74@gmail.com" />
             <Field label="Address" value="Kingston, 5236, United State" />
           </div>
 

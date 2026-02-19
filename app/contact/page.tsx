@@ -29,8 +29,8 @@ export default function ContactPage() {
               Write To US
             </p>
             <p className="text-zinc-700">Fill out our form and we will contact you within 24 hours.</p>
-            <p className="text-zinc-700">Emails: customer@exclusive.com</p>
-            <p className="text-zinc-700">Emails: support@exclusive.com</p>
+            <p className="text-zinc-700">Email: mdqamrul74@gmail.com</p>
+            <p className="text-zinc-700">Support: mdqamrul74@gmail.com</p>
           </div>
         </div>
 

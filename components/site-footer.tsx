@@ -22,7 +22,7 @@ export function SiteFooter() {
         <div className="space-y-3">
           <p className="text-[1.55rem] font-semibold leading-none">Support</p>
           <p className="text-sm text-zinc-300">111 Bijoy sarani, Dhaka, DH 1515, Bangladesh.</p>
-          <p className="text-sm text-zinc-300">exclusive@gmail.com</p>
+          <p className="text-sm text-zinc-300">mdqamrul74@gmail.com</p>
           <p className="text-sm text-zinc-300">+88015-88888-9999</p>
         </div>
 
@@ -68,7 +68,7 @@ export function SiteFooter() {
 
       <div className="border-t border-[#28323F]">
         <div className="mx-auto flex max-w-6xl justify-center px-4 py-4 text-sm text-[#748692] md:px-6">
-          <p>© Copyright RimeI 2022. All right reserved</p>
+          <p>© Copyright Qamrul Hassan Shajal 2026. All right reserved</p>
         </div>
       </div>
     </footer>
