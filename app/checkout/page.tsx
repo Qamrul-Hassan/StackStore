@@ -49,13 +49,13 @@ export default function CheckoutPage() {
 
   return (
     <div className="space-y-10 pb-8">
-      <p className="text-sm text-zinc-500">
-        Account / My Account / Product / View Cart / <span className="text-[#210E14]">CheckOut</span>
+      <p className="text-sm text-zinc-300">
+        Account / My Account / Product / View Cart / <span className="font-semibold text-white">CheckOut</span>
       </p>
 
       <form className="section-single-cart cart-left grid gap-10 lg:grid-cols-[1fr_0.9fr]" onSubmit={onSubmit}>
-        <div className="space-y-5">
-          <h1 className="text-5xl font-semibold text-[#210E14]">Billing Details</h1>
+        <div className="glass-panel section-shell space-y-5 rounded-2xl border border-white/60 bg-white/70 p-6 backdrop-blur-xl md:p-8">
+          <h1 className="text-4xl font-semibold text-[#210E14] md:text-5xl">Billing Details</h1>
           <Field label="First Name*" />
           <Field label="Company Name" />
           <Field label="Street Address*" />
@@ -63,10 +63,10 @@ export default function CheckoutPage() {
           <Field label="Town/City*" />
           <Field label="Phone Number*" />
           <div className="space-y-2">
-            <label className="text-sm text-zinc-500">Email Address*</label>
+            <label className="text-sm font-medium text-[#4b5563]">Email Address*</label>
             <Input
               type="email"
-              className="h-12 bg-[#f5f5f5]"
+              className="h-12 border-[#dce3ea] bg-white/90"
               value={customerEmail}
               onChange={(e) => setCustomerEmail(e.target.value)}
               required
@@ -78,12 +78,13 @@ export default function CheckoutPage() {
           </label>
         </div>
 
-        <div className="space-y-5 text-[#210E14]">
+        <div className="glass-panel section-shell space-y-5 rounded-2xl border border-white/60 bg-white/70 p-6 text-[#210E14] backdrop-blur-xl md:p-8">
+          <h2 className="text-2xl font-semibold text-[#210E14]">Order Summary</h2>
           <div className="space-y-4">
             {cart.items.map((item) => (
-              <div key={item.productId} className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="relative size-12 overflow-hidden rounded bg-[#f5f5f5]">
+              <div key={item.productId} className="flex items-center justify-between gap-4">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="relative size-12 shrink-0 overflow-hidden rounded border border-white/70 bg-white/75 shadow-sm">
                     <img
                       src={item.imageUrl}
                       alt={item.name}
@@ -95,30 +96,30 @@ export default function CheckoutPage() {
                       }}
                     />
                   </div>
-                  <span>{item.name}</span>
+                  <span className="truncate font-medium">{item.name}</span>
                 </div>
-                <span>${(item.price * item.quantity).toFixed(2)}</span>
+                <span className="font-semibold">${(item.price * item.quantity).toFixed(2)}</span>
               </div>
             ))}
           </div>
 
-          <div className="space-y-3 border-t border-[#e5e7eb] pt-4">
+          <div className="space-y-3 border-t border-[#d4dbe5] pt-4">
             <div className="flex items-center justify-between border-b border-[#e5e7eb] pb-3">
               <span>Subtotal:</span>
-              <span>${cart.total.toFixed(2)}</span>
+              <span className="font-medium">${cart.total.toFixed(2)}</span>
             </div>
             <div className="flex items-center justify-between border-b border-[#e5e7eb] pb-3">
               <span>Shipping:</span>
-              <span>Free</span>
+              <span className="font-medium">Free</span>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between text-lg font-semibold">
               <span>Total:</span>
               <span>${cart.total.toFixed(2)}</span>
             </div>
           </div>
 
           <div className="space-y-3 pt-2">
-            <label className="flex items-center gap-2">
+            <label className="flex items-center gap-2 text-sm font-medium">
               <input
                 type="radio"
                 checked={paymentMethod === "stripe"}
@@ -126,7 +127,7 @@ export default function CheckoutPage() {
               />
               Bank
             </label>
-            <label className="flex items-center gap-2">
+            <label className="flex items-center gap-2 text-sm font-medium">
               <input
                 type="radio"
                 checked={paymentMethod === "cod"}
@@ -137,12 +138,21 @@ export default function CheckoutPage() {
           </div>
 
           <div className="flex gap-3 pt-1">
-            <Input className="h-12" placeholder="Coupon Code" />
-            <Button type="button" className="h-12 px-8 normal-case tracking-normal">Apply Coupon</Button>
+            <Input className="h-12 border-white/70 bg-white/80 backdrop-blur-md" placeholder="Coupon Code" />
+            <Button
+              type="button"
+              className="h-12 bg-gradient-to-r from-[#210E14] via-[#712825] to-[#F92D0A] px-8 text-white normal-case tracking-normal transition hover:brightness-110"
+            >
+              Apply Coupon
+            </Button>
           </div>
 
           {error ? <p className="text-sm text-red-600">{error}</p> : null}
-          <Button disabled={submitting} className="h-12 px-10 normal-case tracking-normal" type="submit">
+          <Button
+            disabled={submitting}
+            className="h-12 bg-gradient-to-r from-[#210E14] via-[#712825] to-[#F92D0A] px-10 text-white normal-case tracking-normal transition hover:brightness-110"
+            type="submit"
+          >
             {submitting ? "Placing order..." : "Place Order"}
           </Button>
         </div>
@@ -154,8 +164,8 @@ export default function CheckoutPage() {
 function Field({ label }: { label: string }) {
   return (
     <div className="space-y-2">
-      <label className="text-sm text-zinc-500">{label}</label>
-      <Input className="h-12 bg-[#f5f5f5]" />
+      <label className="text-sm font-medium text-[#4b5563]">{label}</label>
+      <Input className="h-12 border-[#dce3ea] bg-white/90" />
     </div>
   );
 }

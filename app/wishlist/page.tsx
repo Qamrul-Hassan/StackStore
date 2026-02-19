@@ -32,11 +32,13 @@ export default function WishlistPage() {
   return (
     <div className="space-y-12 pb-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-4xl font-semibold text-[#210E14]">Wishlist ({wishlist.count})</h1>
+        <h1 className="text-4xl font-semibold text-white drop-shadow-[0_8px_18px_rgba(0,0,0,0.45)]">
+          Wishlist ({wishlist.count})
+        </h1>
         <button
           disabled={list.length === 0}
           onClick={moveAllToBag}
-          className="rounded border border-[#210E14] px-7 py-3 text-sm font-medium text-[#210E14] transition hover:border-[#F92D0A] hover:text-[#F92D0A] disabled:cursor-not-allowed disabled:opacity-45"
+          className="rounded-lg border border-white/40 bg-white/10 px-7 py-3 text-sm font-medium text-white backdrop-blur-sm transition hover:border-[#FB8500] hover:bg-[#FB8500]/15 hover:text-white disabled:cursor-not-allowed disabled:opacity-45"
         >
           Move All To Bag
         </button>
@@ -66,7 +68,7 @@ export default function WishlistPage() {
 
       <div className="flex items-center justify-between">
         <p className="section-tag">Just For You</p>
-        <button className="rounded border border-[#210E14] px-8 py-3 text-sm font-medium text-[#210E14] transition hover:border-[#F92D0A] hover:text-[#F92D0A]">
+        <button className="rounded-lg border border-white/40 bg-white/10 px-8 py-3 text-sm font-medium text-white backdrop-blur-sm transition hover:border-[#FB8500] hover:bg-[#FB8500]/15 hover:text-white">
           See All
         </button>
       </div>

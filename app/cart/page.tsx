@@ -12,11 +12,11 @@ export default function CartPage() {
 
   return (
     <div className="space-y-10 pb-8">
-      <p className="text-sm text-zinc-500">Home / <span className="text-[#210E14]">Cart</span></p>
+      <p className="text-sm text-zinc-300">Home / <span className="font-semibold text-white">Cart</span></p>
 
-      <div className="glass-panel section-single-cart cart-left overflow-hidden rounded border border-[#e5e7eb]">
+      <div className="glass-panel section-shell section-single-cart cart-left overflow-hidden rounded-2xl">
         <table className="w-full text-left">
-          <thead className="border-b border-[#e5e7eb] text-sm">
+          <thead className="border-b border-[#d4dbe5] text-sm">
             <tr className="text-[#210E14]">
               <th className="px-6 py-4">Product</th>
               <th className="px-6 py-4">Price</th>
@@ -28,16 +28,16 @@ export default function CartPage() {
           <tbody>
             {cart.items.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-6 py-10 text-center text-zinc-500">
+                <td colSpan={5} className="px-6 py-10 text-center text-zinc-600">
                   Your cart is empty. Add products from the shop.
                 </td>
               </tr>
             ) : (
               cart.items.map((item) => (
-                <tr key={item.productId} className="border-b border-[#f1f1f1] text-[#210E14]">
+                <tr key={item.productId} className="border-b border-[#e7edf4] text-[#210E14]">
                   <td className="px-6 py-5">
                     <div className="flex items-center gap-3">
-                      <div className="relative size-14 overflow-hidden rounded bg-[#f5f5f5]">
+                      <div className="relative size-14 overflow-hidden rounded border border-white/70 bg-white/80">
                         <img
                           src={item.imageUrl}
                           alt={item.name}
@@ -83,11 +83,11 @@ export default function CartPage() {
 
       <div className="flex flex-wrap justify-between gap-4">
         <Link href="/">
-          <Button variant="outline" className="h-12 px-8 normal-case tracking-normal">Return To Shop</Button>
+          <Button variant="outline" className="h-12 border-white/50 bg-white/10 px-8 text-white backdrop-blur-sm normal-case tracking-normal hover:bg-white/20">Return To Shop</Button>
         </Link>
         <Button
           variant="outline"
-          className="h-12 px-8 normal-case tracking-normal"
+          className="h-12 border-white/50 bg-white/10 px-8 text-white backdrop-blur-sm normal-case tracking-normal hover:bg-white/20"
           onClick={() => {
             cart.items.forEach((item) => cart.updateQuantity(item.productId, Math.max(1, item.quantity)));
           }}
@@ -98,11 +98,11 @@ export default function CartPage() {
 
       <div className="section-single-cart cart-right grid gap-8 lg:grid-cols-2">
         <div className="flex gap-3">
-          <Input className="h-12" placeholder="Coupon Code" />
-          <Button className="h-12 px-8 normal-case tracking-normal">Apply Coupon</Button>
+          <Input className="h-12 border-white/50 bg-white/80" placeholder="Coupon Code" />
+          <Button className="h-12 bg-gradient-to-r from-[#210E14] via-[#712825] to-[#F92D0A] px-8 text-white normal-case tracking-normal">Apply Coupon</Button>
         </div>
 
-        <div className="rounded border border-[#210E14] bg-white p-6">
+        <div className="glass-panel section-shell rounded-2xl p-6">
           <h3 className="text-2xl font-semibold text-[#210E14]">Cart Total</h3>
           <div className="mt-4 space-y-4 text-[#210E14]">
             <div className="flex items-center justify-between border-b border-[#e5e7eb] pb-3">
@@ -119,7 +119,7 @@ export default function CartPage() {
             </div>
           </div>
           <Link href="/checkout" className="mt-6 inline-block">
-            <Button className="h-12 px-10 normal-case tracking-normal">Proceed to checkout</Button>
+            <Button className="h-12 bg-gradient-to-r from-[#210E14] via-[#712825] to-[#F92D0A] px-10 text-white normal-case tracking-normal">Proceed to checkout</Button>
           </Link>
         </div>
       </div>

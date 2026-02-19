@@ -61,19 +61,19 @@ export default async function CategoryPage({
 
   return (
     <div className="space-y-10 pb-8">
-      <p className="text-sm text-zinc-500">
-        Home / Categories / <span className="text-[#210E14]">{pageTitle}</span>
+      <p className="text-sm text-zinc-300">
+        Home / Categories / <span className="font-semibold text-white">{pageTitle}</span>
       </p>
 
       <div className="section-single-cart cart-right flex flex-wrap items-center gap-2">
-        <Link href="/categories/all" className="rounded-md border border-[#dce3ea] bg-white px-3 py-1.5 text-sm text-[#210E14] hover:border-[#F92D0A] hover:text-[#F92D0A]">
+        <Link href="/categories/all" className="rounded-md border border-white/40 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur-sm transition hover:border-[#FB8500] hover:bg-[#FB8500]/15">
           All
         </Link>
         {primaryCategoryLinks.map((entry) => (
           <Link
             key={entry.slug}
             href={`/categories/${entry.slug}`}
-            className="rounded-md border border-[#dce3ea] bg-white px-3 py-1.5 text-sm text-[#210E14] transition hover:border-[#F92D0A] hover:text-[#F92D0A]"
+            className="rounded-md border border-white/40 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur-sm transition hover:border-[#FB8500] hover:bg-[#FB8500]/15"
           >
             {entry.label}
           </Link>
@@ -82,7 +82,7 @@ export default async function CategoryPage({
           <Link
             key={category}
             href={`/categories/${toCategorySlug(category)}`}
-            className="rounded-md border border-[#dce3ea] bg-white px-3 py-1.5 text-sm text-[#210E14] transition hover:border-[#F92D0A] hover:text-[#F92D0A]"
+            className="rounded-md border border-white/40 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur-sm transition hover:border-[#FB8500] hover:bg-[#FB8500]/15"
           >
             {formatCategory(category)}
           </Link>
@@ -92,7 +92,7 @@ export default async function CategoryPage({
       <h1 className="section-title !text-white">{pageTitle}</h1>
 
       {sortedItems.length === 0 ? (
-        <div className="glass-panel section-single-cart cart-left p-8 text-sm text-zinc-600">
+        <div className="glass-panel section-shell section-single-cart cart-left rounded-2xl p-8 text-sm text-zinc-700">
           Products for this category are coming soon.
         </div>
       ) : (

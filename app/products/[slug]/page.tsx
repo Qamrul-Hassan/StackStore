@@ -25,8 +25,8 @@ export default async function ProductDetailsPage({
 
   return (
     <div className="space-y-14 pb-8">
-      <p className="text-sm text-zinc-500">
-        Home / {formatCategory(product.category)} / <span className="text-[#210E14]">{product.name}</span>
+      <p className="text-sm text-zinc-300">
+        Home / {formatCategory(product.category)} / <span className="font-semibold text-white">{product.name}</span>
       </p>
 
       <div className="section-single-cart cart-left">
@@ -44,7 +44,7 @@ export default async function ProductDetailsPage({
         />
       </div>
 
-      <section className="section-single-cart cart-right space-y-6">
+      <section className="glass-panel section-shell section-single-cart cart-right space-y-6 rounded-2xl p-6 md:p-8">
         <p className="section-tag">Related Item</p>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {related.map((item) => (
@@ -53,7 +53,7 @@ export default async function ProductDetailsPage({
         </div>
       </section>
 
-      <Link href="/" className="inline-block text-sm text-[#F92D0A] underline">
+      <Link href="/" className="inline-block rounded-md border border-white/40 bg-white/10 px-3 py-1.5 text-sm text-white underline backdrop-blur-sm transition hover:border-[#FB8500] hover:bg-[#FB8500]/15">
         Back to home
       </Link>
     </div>
