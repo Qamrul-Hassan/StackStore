@@ -19,7 +19,7 @@ import { ReactNode, useEffect, useMemo, useState } from "react";
 import { useDataContext } from "@/components/data-context";
 import { ProductCard } from "@/components/product-card";
 import type { CatalogProduct } from "@/lib/catalog";
-import { formatCategory, toCategorySlug } from "@/lib/catalog";
+import { extractCategories, formatCategory, toCategorySlug } from "@/lib/catalog";
 import { storeItems } from "@/lib/store-data";
 
 const fallbackProducts: CatalogProduct[] = storeItems.map((item) => ({
@@ -55,17 +55,19 @@ export default function HomePage() {
   const [heroPage, setHeroPage] = useState(0);
   const [explorePage, setExplorePage] = useState(0);
 
-  const heroCategories = [
-    "Woman's Fashion",
-    "Men's Fashion",
-    "Electronics",
-    "Home & Lifestyle",
-    "Medicine",
-    "Sports & Outdoor",
-    "Baby's & Toys",
-    "Groceries & Pets",
-    "Health & Beauty"
-  ];
+  const allCategories = useMemo(
+    () => extractCategories(catalog).sort((a, b) => formatCategory(a).localeCompare(formatCategory(b))),
+    [catalog]
+  );
+  const homeCategoryLinks = useMemo(() => {
+    const links = allCategories.map((category) => ({
+      label: formatCategory(category),
+      slug: toCategorySlug(category)
+    }));
+
+    links.unshift({ label: "Women's Fashion", slug: "womans-fashion" });
+    return links;
+  }, [allCategories]);
   const heroProducts = useMemo(() => {
     const phoneLike = catalog.filter((item) => {
       const category = toCategorySlug(item.category);
@@ -161,18 +163,18 @@ export default function HomePage() {
   }, [heroPageCount]);
 
   return (
-    <div className="space-y-12 pb-12 pt-12 md:space-y-14 md:pt-14 lg:space-y-16 lg:pt-16">
-      <section id="hero" className="section-single-cart cart-left mt-0 grid gap-6 lg:grid-cols-[265px_1fr]">
-        <aside className="glass-panel hidden p-5 lg:block">
+    <div className="space-y-10 pb-12 pt-4 md:space-y-12 md:pt-6 lg:space-y-14 lg:pt-8">
+      <section id="hero" className="section-single-cart cart-left mt-0 grid gap-4 lg:grid-cols-[265px_1fr] lg:items-stretch lg:gap-6">
+        <aside className="glass-panel hidden h-full p-5 lg:flex lg:h-[500px] lg:flex-col">
           <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-[#712825]">Shop Categories</p>
-          <ul className="space-y-2.5 text-sm text-[#210E14]">
-            {heroCategories.map((category) => (
-              <li key={category}>
+          <ul className="no-scrollbar flex-1 space-y-2 overflow-auto pr-1 text-sm text-[#210E14]">
+            {homeCategoryLinks.map((category) => (
+              <li key={category.slug}>
                 <Link
-                  href={`/categories/${getHomeCategorySlug(category)}`}
+                  href={`/categories/${category.slug}`}
                   className="flex items-center justify-between rounded-lg px-2.5 py-2 transition hover:bg-[#FB8500]/10 hover:text-[#F92D0A]"
                 >
-                  <span>{category}</span>
+                  <span>{category.label}</span>
                   <ChevronRight className="size-4" />
                 </Link>
               </li>
@@ -180,21 +182,21 @@ export default function HomePage() {
           </ul>
         </aside>
 
-        <div className="relative overflow-hidden rounded-2xl border border-[#344154] bg-gradient-to-r from-[#210E14] via-[#28323F] to-[#210E14] px-7 pb-7 pt-8 text-white shadow-[0_40px_62px_-38px_rgba(33,14,20,0.95)] md:px-10">
+        <div className="relative overflow-hidden rounded-2xl border border-[#344154] bg-gradient-to-r from-[#210E14] via-[#28323F] to-[#210E14] px-4 pb-4 pt-4 text-white shadow-[0_40px_62px_-38px_rgba(33,14,20,0.95)] sm:px-6 sm:pb-5 sm:pt-5 md:px-9 md:pb-6 md:pt-6 lg:flex lg:h-[500px] lg:flex-col">
           <div className="pointer-events-none absolute -left-20 top-1/2 size-72 -translate-y-1/2 rounded-full bg-[#FB8500]/24 blur-3xl" />
           <div className="pointer-events-none absolute -right-24 -top-24 size-80 rounded-full bg-[#F92D0A]/20 blur-3xl" />
-          <div className="grid items-center gap-6 md:grid-cols-[1fr_460px]">
-            <div className="space-y-5">
-              <p className="text-[1.95rem] leading-tight text-white/90">{heroTitle}</p>
-              <h1 className="text-5xl font-semibold leading-[1.05] md:text-6xl">Up to {heroDiscount}% off Voucher</h1>
+          <div className="grid items-center gap-4 sm:gap-5 md:grid-cols-[1fr_390px] lg:flex-1">
+            <div className="space-y-3 sm:space-y-5">
+              <p className="text-lg leading-tight text-white/90 sm:text-xl md:text-[1.7rem]">{heroTitle}</p>
+              <h1 className="text-3xl font-semibold leading-[1.05] sm:text-4xl md:text-5xl">Up to {heroDiscount}% off Voucher</h1>
               <Link
                 href={`/products/${activeHeroProduct.slug}`}
-                className="inline-flex items-center gap-2 border-b border-white/80 pb-1 text-2xl font-medium transition hover:text-[#FB8500]"
+                className="inline-flex items-center gap-2 border-b border-white/80 pb-1 text-base font-medium transition hover:text-[#FB8500] sm:text-lg md:text-xl"
               >
                 Shop Now <ArrowRight className="size-6" />
               </Link>
             </div>
-            <div className="relative h-[330px] md:h-[460px]">
+            <div className="relative h-48 sm:h-60 md:h-[350px]">
               <Image src={heroImage} alt={activeHeroProduct.name} fill unoptimized className="object-contain" />
             </div>
           </div>
@@ -222,13 +224,13 @@ export default function HomePage() {
         <StatPill label="Top Rated Picks" value={`${bestSelling.length} Featured`} />
       </section>
 
-      <section id="flash-sales" className="glass-panel space-y-6 p-6 md:p-8">
-        <div className="flex items-center justify-between gap-4">
+      <section id="flash-sales" className="glass-panel space-y-6 p-5 sm:p-6 md:p-8">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-2">
             <p className="section-tag">Today&apos;s</p>
             <h2 className="section-title">Flash Sales</h2>
           </div>
-          <div className="text-right">
+          <div className="text-left sm:text-right">
             {loadingProducts ? <p className="text-sm text-[#748692]">Refreshing products...</p> : null}
             <Link href="/categories/all" className="text-sm font-semibold text-[#F92D0A] hover:text-[#FB8500]">
               See all deals
@@ -242,34 +244,34 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="categories" className="glass-panel section-single-cart cart-right space-y-6 p-6 md:p-8">
+      <section id="categories" className="glass-panel section-single-cart cart-left space-y-6 p-5 sm:p-6 md:p-8">
         <div className="space-y-2">
           <p className="section-tag">Categories</p>
-          <h2 className="section-title">Browse By Category</h2>
+          <h2 className="section-title">Browse By Category ({allCategories.length})</h2>
         </div>
         <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
-          {heroCategories.slice(0, 6).map((category) => (
+          {homeCategoryLinks.map((category) => (
             <Link
-              href={`/categories/${getHomeCategorySlug(category)}`}
-              key={category}
+              href={`/categories/${category.slug}`}
+              key={category.slug}
               className="group rounded-xl border border-[#dae1ea] bg-white px-3 py-4 text-[#210E14] shadow-[0_16px_26px_-20px_rgba(33,14,20,0.65)] transition hover:-translate-y-0.5 hover:border-[#F92D0A]/45 hover:bg-[#FB8500]/5"
             >
               <span className="mb-2 inline-flex size-9 items-center justify-center rounded-full bg-[#F4F6FA] text-[#28323F] transition group-hover:bg-[#FB8500]/15 group-hover:text-[#F92D0A]">
-                {categoryIcon(category)}
+                {categoryIcon(category.label)}
               </span>
-              <p className="text-sm font-semibold">{formatCategory(category)}</p>
+              <p className="text-sm font-semibold">{category.label}</p>
             </Link>
           ))}
         </div>
       </section>
 
-      <section id="best-selling" className="glass-panel section-single-cart cart-left space-y-6 p-6 md:p-8">
-        <div className="flex items-center justify-between gap-4">
+      <section id="best-selling" className="glass-panel section-single-cart cart-right space-y-6 p-5 sm:p-6 md:p-8">
+        <div className="flex flex-wrap items-start justify-between gap-4 sm:items-center">
           <div className="space-y-2">
             <p className="section-tag">Top Rated</p>
             <h2 className="section-title">Best Selling Products</h2>
           </div>
-          <Link href="/categories/all" className="lava-button inline-flex px-7 py-3">
+          <Link href="/categories/all" className="lava-button inline-flex px-6 py-2.5 sm:px-7 sm:py-3">
             View All
           </Link>
         </div>
@@ -280,7 +282,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="section-single-cart cart-right relative overflow-hidden rounded-2xl border border-[#3e4a5b] bg-[#210E14] px-7 py-9 text-white shadow-[0_32px_46px_-30px_rgba(33,14,20,0.95)] md:px-12 md:py-10">
+      <section className="relative overflow-hidden rounded-2xl border border-[#3e4a5b] bg-[#210E14] px-5 py-7 text-white shadow-[0_32px_46px_-30px_rgba(33,14,20,0.95)] sm:px-7 sm:py-9 md:px-12 md:py-10">
         <div className="relative grid gap-8 md:grid-cols-2 md:items-center">
           <div className="space-y-4">
             <p className="text-sm font-semibold uppercase tracking-wide text-[#FB8500]">Featured Product</p>
@@ -296,7 +298,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="explore-products" className="glass-panel section-single-cart cart-left space-y-6 p-6 md:p-8">
+      <section id="explore-products" className="glass-panel section-single-cart cart-left space-y-6 p-5 sm:p-6 md:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-2">
             <p className="section-tag">Our Products</p>
@@ -342,7 +344,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="featured" className="glass-panel section-single-cart cart-right space-y-6 p-6 md:p-8">
+      <section id="featured" className="glass-panel section-single-cart cart-right space-y-6 p-5 sm:p-6 md:p-8">
         <div className="space-y-2">
           <p className="section-tag">New Arrival</p>
           <h2 className="section-title">Fresh In Store</h2>
@@ -354,7 +356,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="support" className="glass-panel section-single-cart cart-left grid gap-8 p-8 text-center md:grid-cols-3">
+      <section id="support" className="glass-panel section-single-cart cart-left grid gap-6 p-6 text-center sm:p-8 md:grid-cols-3">
         <FeatureIcon icon={<Truck className="size-5" />} title="FREE AND FAST DELIVERY" copy="Free delivery for all orders over $140" />
         <FeatureIcon icon={<ShieldCheck className="size-5" />} title="SECURE CHECKOUT" copy="Protected payment and trusted fulfillment" />
         <FeatureIcon icon={<Headphones className="size-5" />} title="24/7 CUSTOMER SUPPORT" copy="Always available when you need help" />
@@ -409,17 +411,3 @@ function normalizeName(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
-function getHomeCategorySlug(label: string) {
-  const map: Record<string, string> = {
-    "Woman's Fashion": "womans-fashion",
-    "Men's Fashion": "mens-fashion",
-    Electronics: "electronics",
-    "Home & Lifestyle": "home-and-lifestyle",
-    Medicine: "medicine",
-    "Sports & Outdoor": "sports-and-outdoor",
-    "Baby's & Toys": "babys-and-toys",
-    "Groceries & Pets": "groceries-and-pets",
-    "Health & Beauty": "health-and-beauty"
-  };
-  return map[label] ?? toCategorySlug(label);
-}

@@ -25,8 +25,8 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-[#d2d8df] bg-white/85 shadow-[0_18px_40px_-26px_rgba(33,14,20,0.88)] backdrop-blur-lg">
       <div className="bg-gradient-to-r from-[#210E14] via-[#28323F] to-[#210E14] text-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-2 text-[11px] md:px-6">
-          <p className="w-full text-center md:w-auto">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-3 py-2 text-[10px] sm:px-4 sm:text-[11px] md:px-6">
+          <p className="w-full text-center leading-tight md:w-auto">
             Summer Sale For All Swim Suits And Free Express Delivery - OFF 50%!{" "}
             <Link href="/" className="font-semibold underline">
               ShopNow
@@ -37,7 +37,7 @@ export function SiteHeader() {
           </button>
         </div>
       </div>
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 md:px-6">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-3 py-3 sm:px-4 md:gap-4 md:px-6 md:py-4">
         <Link href="/" className="flex items-center gap-3">
           <Logo />
         </Link>
@@ -55,7 +55,7 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
           <div className="hidden items-center gap-2 rounded-full border border-[#d9e0e7] bg-white px-3 py-2 shadow-[0_14px_22px_-18px_rgba(40,50,63,0.75)] md:flex">
             <input
               className="w-40 bg-transparent text-sm outline-none placeholder:text-[#9ca3af]"
@@ -73,6 +73,35 @@ export function SiteHeader() {
           <IconWrap icon={<ShoppingCart className="size-5" />} badge={cartCount} href="/cart" flyTarget="cart" />
           <IconWrap icon={<User className="size-5" />} href="/account" />
         </div>
+      </div>
+      <div className="mx-auto max-w-6xl px-3 pb-3 sm:px-4 md:hidden">
+        <div className="mb-2 flex items-center gap-2 rounded-full border border-[#d9e0e7] bg-white px-3 py-2 shadow-[0_14px_22px_-18px_rgba(40,50,63,0.75)]">
+          <input
+            className="w-full bg-transparent text-sm outline-none placeholder:text-[#9ca3af]"
+            placeholder="Search products..."
+          />
+          <button
+            type="button"
+            className="grid size-7 place-items-center rounded-full bg-gradient-to-r from-[#FB8500] to-[#F92D0A] text-white"
+            aria-label="Search"
+          >
+            <Search className="size-3.5" />
+          </button>
+        </div>
+        <nav className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
+          {navLinks.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "shrink-0 rounded-full border border-[#d9e0e7] bg-white px-4 py-1.5 text-xs font-semibold text-[#28323F] transition",
+                pathname === item.href && "border-transparent bg-gradient-to-r from-[#FB8500] to-[#F92D0A] text-white"
+              )}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
       </div>
     </header>
   );
@@ -92,7 +121,7 @@ function IconWrap({
   const content = (
     <span
       data-fly-target={flyTarget}
-      className="relative inline-flex size-10 items-center justify-center rounded-full border border-[#d7dee6] bg-white text-[#28323F] shadow-[0_10px_16px_-14px_rgba(33,14,20,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#FB8500] hover:bg-gradient-to-r hover:from-[#FB8500] hover:to-[#F92D0A] hover:text-white"
+      className="relative inline-flex size-9 items-center justify-center rounded-full border border-[#d7dee6] bg-white text-[#28323F] shadow-[0_10px_16px_-14px_rgba(33,14,20,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#FB8500] hover:bg-gradient-to-r hover:from-[#FB8500] hover:to-[#F92D0A] hover:text-white md:size-10"
     >
       {icon}
       {typeof badge === "number" ? (

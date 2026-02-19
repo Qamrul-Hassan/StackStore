@@ -50,7 +50,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
 
   return (
     <div className="group animate-fade-up rounded-2xl border border-white/20 bg-[linear-gradient(160deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] p-2 shadow-[0_24px_36px_-28px_rgba(0,0,0,0.65)] transition duration-300 hover:-translate-y-1">
-      <div className="relative overflow-hidden rounded-xl border border-white/60 bg-[linear-gradient(160deg,rgba(255,255,255,0.96)_0%,rgba(236,242,249,0.94)_55%,rgba(226,232,240,0.9)_100%)] p-3.5 transition-all duration-300 group-hover:border-[#FB8500]/65 group-hover:shadow-[0_30px_36px_-24px_rgba(33,14,20,0.75)]">
+      <div className="relative overflow-hidden rounded-xl border border-white/60 bg-[linear-gradient(160deg,rgba(255,255,255,0.96)_0%,rgba(236,242,249,0.94)_55%,rgba(226,232,240,0.9)_100%)] p-3 transition-all duration-300 group-hover:border-[#FB8500]/65 group-hover:shadow-[0_30px_36px_-24px_rgba(33,14,20,0.75)] sm:p-3.5">
         <div className="pointer-events-none absolute inset-x-2 top-0 h-20 rounded-b-[26px] bg-[radial-gradient(circle_at_top,rgba(251,133,0,0.25),rgba(251,133,0,0)_72%)]" />
         {product.badge ? (
           <span className="absolute left-3 top-3 z-20 rounded-md border border-white/55 bg-[linear-gradient(105deg,#F92D0A_0%,#FB8500_100%)] px-2.5 py-1 text-xs font-bold leading-none text-white shadow-[0_12px_20px_-12px_rgba(249,45,10,0.95)]">
@@ -162,16 +162,16 @@ export function ProductCard({ product }: { product: ProductCardType }) {
           />
         </div>
       </div>
-      <div className="mt-2.5 rounded-xl border border-white/15 bg-[linear-gradient(170deg,rgba(40,50,63,0.78),rgba(33,14,20,0.82))] px-3 py-3.5">
-        <h3 className="line-clamp-1 text-[1.06rem] font-semibold leading-tight text-white">
+      <div className="mt-2.5 rounded-xl border border-white/15 bg-[linear-gradient(170deg,rgba(40,50,63,0.78),rgba(33,14,20,0.82))] px-3 py-3">
+        <h3 className="line-clamp-1 text-[0.98rem] font-semibold leading-tight text-white sm:text-[1.06rem]">
           {product.name}
         </h3>
         <div className="mt-1.5 flex items-end gap-3">
-          <span className="text-[1.2rem] font-bold text-[#FF6A33]">${product.price}</span>
-          {product.oldPrice ? <span className="text-sm text-zinc-300/80 line-through">${product.oldPrice}</span> : null}
+          <span className="text-[1.04rem] font-bold text-[#FF6A33] sm:text-[1.2rem]">${product.price}</span>
+          {product.oldPrice ? <span className="text-xs text-zinc-300/80 line-through sm:text-sm">${product.oldPrice}</span> : null}
         </div>
         {product.rating ? (
-          <div className="mt-1.5 flex items-center gap-2 text-[0.88rem] text-zinc-200/85">
+          <div className="mt-1.5 flex items-center gap-2 text-[0.8rem] text-zinc-200/85 sm:text-[0.88rem]">
             <span className="text-[#FB8500]">★★★★★</span>
             <span>({product.reviews ?? 0})</span>
           </div>

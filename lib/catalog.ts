@@ -16,6 +16,9 @@ type DummyJsonProduct = {
 
 type DummyJsonProductsResponse = {
   products?: DummyJsonProduct[];
+  total?: number;
+  skip?: number;
+  limit?: number;
 };
 
 export type CatalogProduct = {
@@ -208,13 +211,28 @@ export function getFallbackCatalogProducts(): CatalogProduct[] {
 
 export async function fetchCatalogProducts(limit = 100): Promise<CatalogProduct[]> {
   try {
-    const response = await fetch(`https://dummyjson.com/products?limit=${limit}`, {
+    const firstResponse = await fetch(`https://dummyjson.com/products?limit=${limit}&skip=0`, {
       next: { revalidate: 900 }
     });
-    if (!response.ok) throw new Error(`DummyJSON error: ${response.status}`);
-    const data = (await response.json()) as DummyJsonProductsResponse;
-    if (!Array.isArray(data.products)) throw new Error("No products list");
-    return data.products.map(mapDummyJsonProduct);
+    if (!firstResponse.ok) throw new Error(`DummyJSON error: ${firstResponse.status}`);
+    const firstData = (await firstResponse.json()) as DummyJsonProductsResponse;
+    if (!Array.isArray(firstData.products)) throw new Error("No products list");
+
+    const total = firstData.total ?? firstData.products.length;
+    const batchSize = firstData.limit ?? limit;
+    const all = [...firstData.products];
+
+    for (let skip = all.length; skip < total; skip += batchSize) {
+      const response = await fetch(`https://dummyjson.com/products?limit=${batchSize}&skip=${skip}`, {
+        next: { revalidate: 900 }
+      });
+      if (!response.ok) break;
+      const data = (await response.json()) as DummyJsonProductsResponse;
+      if (!Array.isArray(data.products) || data.products.length === 0) break;
+      all.push(...data.products);
+    }
+
+    return all.map(mapDummyJsonProduct);
   } catch {
     return getFallbackCatalogProducts();
   }

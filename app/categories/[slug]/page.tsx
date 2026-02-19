@@ -4,7 +4,7 @@ import { ProductCard } from "@/components/product-card";
 import { extractCategories, fetchCatalogProducts, formatCategory, toCategorySlug } from "@/lib/catalog";
 
 const CATEGORY_ALIAS: Record<string, string[]> = {
-  "womans-fashion": ["womens-dresses", "womens-shoes", "womens-watches", "tops", "womens-bags"],
+  "womans-fashion": ["womens-dresses", "womens-shoes", "womens-watches", "tops", "womens-bags", "womens-jewellery"],
   "mens-fashion": ["mens-shirts", "mens-shoes", "mens-watches"],
   electronics: ["smartphones", "laptops", "tablets", "mobile-accessories"],
   "home-and-lifestyle": ["home-decoration", "furniture", "kitchen-accessories"],
@@ -51,6 +51,13 @@ export default async function CategoryPage({
   }
 
   const pageTitle = normalized === "all" ? "All Products" : readableCategoryTitle(normalized, items[0]?.category);
+  const primaryCategoryLinks = [
+    { label: "Women's Fashion", slug: "womans-fashion" },
+    { label: "Men's Fashion", slug: "mens-fashion" },
+    { label: "Electronics", slug: "electronics" },
+    { label: "Home & Lifestyle", slug: "home-and-lifestyle" },
+    { label: "Health & Beauty", slug: "health-and-beauty" }
+  ];
 
   return (
     <div className="space-y-10 pb-8">
@@ -62,6 +69,15 @@ export default async function CategoryPage({
         <Link href="/categories/all" className="rounded-md border border-[#dce3ea] bg-white px-3 py-1.5 text-sm text-[#210E14] hover:border-[#F92D0A] hover:text-[#F92D0A]">
           All
         </Link>
+        {primaryCategoryLinks.map((entry) => (
+          <Link
+            key={entry.slug}
+            href={`/categories/${entry.slug}`}
+            className="rounded-md border border-[#dce3ea] bg-white px-3 py-1.5 text-sm text-[#210E14] transition hover:border-[#F92D0A] hover:text-[#F92D0A]"
+          >
+            {entry.label}
+          </Link>
+        ))}
         {categories.slice(0, 14).map((category) => (
           <Link
             key={category}
