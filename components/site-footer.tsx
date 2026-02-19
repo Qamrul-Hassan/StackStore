@@ -1,8 +1,14 @@
-﻿import Link from "next/link";
+﻿import Image from "next/image";
+import Link from "next/link";
 import { Facebook, Instagram, Linkedin, SendHorizontal, Twitter } from "lucide-react";
 import { ReactNode } from "react";
 
 export function SiteFooter() {
+  const profileUrl = "https://portfolio-next16.vercel.app/";
+  const googlePlayUrl = "https://play.google.com/store";
+  const appStoreUrl = "https://www.apple.com/app-store/";
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=512x512&margin=4&data=${encodeURIComponent(profileUrl)}`;
+
   return (
     <footer className="mt-24 border-t border-[#28323F] bg-[radial-gradient(circle_at_20%_5%,rgba(251,133,0,0.18),transparent_35%),radial-gradient(circle_at_85%_0%,rgba(142,180,194,0.12),transparent_32%),linear-gradient(180deg,#07090d_0%,#050607_100%)] text-white">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-5 md:px-6">
@@ -45,16 +51,55 @@ export function SiteFooter() {
 
         <div className="space-y-3">
           <p className="text-[1.55rem] font-semibold leading-none">Download App</p>
-          <p className="text-xs text-[#748692]">Save $3 with App New User Only</p>
-          <div className="grid grid-cols-[84px_1fr] gap-2">
-            <div className="grid place-items-center rounded border border-[#748692] text-xs text-[#748692]">QR</div>
+          <p className="text-xs text-[#748692]">Scan to open your profile page</p>
+          <div className="grid grid-cols-[96px_1fr] items-start gap-2">
+            <a
+              href={profileUrl}
+              className="overflow-hidden rounded border border-[#748692] bg-white p-1"
+              aria-label="Open profile page"
+            >
+              <Image
+                src={qrCodeUrl}
+                alt="QR code to profile page"
+                width={96}
+                height={96}
+                className="h-[96px] w-[96px] object-contain"
+                loading="lazy"
+                unoptimized
+                referrerPolicy="no-referrer"
+              />
+            </a>
             <div className="space-y-2">
-              <div className="rounded border border-[#748692] bg-black/25 px-3 py-2 text-xs text-zinc-300 transition hover:border-[#FB8500]">
-                Google Play
-              </div>
-              <div className="rounded border border-[#748692] bg-black/25 px-3 py-2 text-xs text-zinc-300 transition hover:border-[#FB8500]">
-                App Store
-              </div>
+              <a
+                href={googlePlayUrl}
+                aria-label="Open Google Play profile link"
+                className="grid h-[52px] w-[52px] place-items-center rounded-md border border-[#748692] bg-black/25 transition hover:border-[#FB8500]"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Image
+                  src="/assets/sections/google-play-icon.svg?v=2"
+                  alt="Google Play icon"
+                  width={28}
+                  height={28}
+                  className="h-[28px] w-[28px]"
+                />
+              </a>
+              <a
+                href={appStoreUrl}
+                aria-label="Open App Store profile link"
+                className="grid h-[52px] w-[52px] place-items-center rounded-md border border-[#748692] bg-black/25 transition hover:border-[#FB8500]"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Image
+                  src="/assets/sections/app-store-icon.svg?v=3"
+                  alt="App Store icon"
+                  width={28}
+                  height={28}
+                  className="h-[28px] w-[28px]"
+                />
+              </a>
             </div>
           </div>
           <div className="flex items-center gap-4 pt-2 text-zinc-300">
@@ -90,3 +135,5 @@ function FooterIcon({ icon }: { icon: ReactNode }) {
     </span>
   );
 }
+
+
