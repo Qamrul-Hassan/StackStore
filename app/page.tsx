@@ -225,10 +225,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="glass-panel section-shell section-single-cart cart-right grid gap-3 p-5 sm:grid-cols-3 sm:p-6">
-        <StatPill label="Products Live" value={`${catalog.length}+`} />
-        <StatPill label="Hot Discounts" value={`${flashSale.length} Today`} />
-        <StatPill label="Top Rated Picks" value={`${bestSelling.length} Featured`} />
+      <section className="glass-panel section-shell section-single-cart cart-right p-5 sm:p-6">
+        <h2 className="sr-only">Store Highlights</h2>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <StatPill label="Products Live" value={`${catalog.length}+`} />
+          <StatPill label="Hot Discounts" value={`${flashSale.length} Today`} />
+          <StatPill label="Top Rated Picks" value={`${bestSelling.length} Featured`} />
+        </div>
       </section>
 
       <section id="flash-sales" className="glass-panel section-shell space-y-6 p-5 sm:p-6 md:p-8">
@@ -363,10 +366,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="support" className="glass-panel section-shell section-single-cart cart-left grid gap-6 p-6 text-center sm:p-8 md:grid-cols-3">
-        <FeatureIcon icon={<Truck className="size-5" />} title="FREE AND FAST DELIVERY" copy="Free delivery for all orders over $140" />
-        <FeatureIcon icon={<ShieldCheck className="size-5" />} title="SECURE CHECKOUT" copy="Protected payment and trusted fulfillment" />
-        <FeatureIcon icon={<Headphones className="size-5" />} title="24/7 CUSTOMER SUPPORT" copy="Always available when you need help" />
+      <section id="support" className="glass-panel section-shell section-single-cart cart-left p-6 text-center sm:p-8">
+        <h2 className="sr-only">Support Features</h2>
+        <div className="grid gap-6 md:grid-cols-3">
+          <FeatureIcon icon={<Truck className="size-5" />} title="FREE AND FAST DELIVERY" copy="Free delivery for all orders over $140" />
+          <FeatureIcon icon={<ShieldCheck className="size-5" />} title="SECURE CHECKOUT" copy="Protected payment and trusted fulfillment" />
+          <FeatureIcon icon={<Headphones className="size-5" />} title="24/7 CUSTOMER SUPPORT" copy="Always available when you need help" />
+        </div>
       </section>
     </div>
   );
@@ -406,7 +412,7 @@ function FeatureIcon({ icon, title, copy }: { icon: ReactNode; title: string; co
   return (
     <div className="space-y-2">
       <div className="mx-auto icon-circle">{icon}</div>
-      <h4 className="text-lg font-semibold text-[#210E14]">{title}</h4>
+      <h3 className="text-lg font-semibold text-[#210E14]">{title}</h3>
       <p className="text-sm text-zinc-500">{copy}</p>
     </div>
   );
@@ -427,4 +433,5 @@ function getHeroImageForProduct(name: string, fallbackImage: string) {
 function normalizeName(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
+
 

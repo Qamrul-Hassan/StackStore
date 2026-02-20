@@ -56,38 +56,46 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
-          <div className="hidden items-center gap-2 rounded-full border border-[#d9e0e7] bg-white px-3 py-2 shadow-[0_14px_22px_-18px_rgba(40,50,63,0.75)] md:flex">
+          <form role="search" aria-label="Site search" className="hidden items-center gap-2 rounded-full border border-[#d9e0e7] bg-white px-3 py-2 shadow-[0_14px_22px_-18px_rgba(40,50,63,0.75)] md:flex">
+            <label htmlFor="desktop-site-search" className="sr-only">
+              Search products
+            </label>
             <input
+              id="desktop-site-search"
               className="w-40 bg-transparent text-sm outline-none placeholder:text-[#9ca3af]"
               placeholder="What are you looking for?"
             />
             <button
-              type="button"
+              type="submit"
               className="grid size-7 place-items-center rounded-full bg-gradient-to-r from-[#FB8500] to-[#F92D0A] text-white"
               aria-label="Search"
             >
               <Search className="size-3.5" />
             </button>
-          </div>
+          </form>
           <IconWrap icon={<Heart className="size-5" />} badge={wishlist.count} href="/wishlist" flyTarget="wishlist" />
           <IconWrap icon={<ShoppingCart className="size-5" />} badge={cartCount} href="/cart" flyTarget="cart" />
           <IconWrap icon={<User className="size-5" />} href="/account" />
         </div>
       </div>
       <div className="mx-auto max-w-6xl px-3 pb-3 sm:px-4 md:hidden">
-        <div className="mb-2 flex items-center gap-2 rounded-full border border-[#d9e0e7] bg-white px-3 py-2 shadow-[0_14px_22px_-18px_rgba(40,50,63,0.75)]">
+        <form role="search" aria-label="Mobile site search" className="mb-2 flex items-center gap-2 rounded-full border border-[#d9e0e7] bg-white px-3 py-2 shadow-[0_14px_22px_-18px_rgba(40,50,63,0.75)]">
+          <label htmlFor="mobile-site-search" className="sr-only">
+            Search products
+          </label>
           <input
+            id="mobile-site-search"
             className="w-full bg-transparent text-sm outline-none placeholder:text-[#9ca3af]"
             placeholder="Search products..."
           />
           <button
-            type="button"
+            type="submit"
             className="grid size-7 place-items-center rounded-full bg-gradient-to-r from-[#FB8500] to-[#F92D0A] text-white"
             aria-label="Search"
           >
             <Search className="size-3.5" />
           </button>
-        </div>
+        </form>
         <nav className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
           {navLinks.map((item) => (
             <Link
@@ -135,3 +143,4 @@ function IconWrap({
   if (href) return <Link href={href}>{content}</Link>;
   return content;
 }
+

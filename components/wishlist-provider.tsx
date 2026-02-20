@@ -38,18 +38,17 @@ function normalizeIds(input: unknown): string[] {
 }
 
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
-  const [ids, setIds] = useState<string[]>(DEFAULT_IDS);
-
-  useEffect(() => {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return;
+  const [ids, setIds] = useState<string[]>(() => {
+    if (typeof window === "undefined") return DEFAULT_IDS;
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return DEFAULT_IDS;
     try {
       const parsed = JSON.parse(raw);
-      setIds(normalizeIds(parsed));
+      return normalizeIds(parsed);
     } catch {
-      setIds(DEFAULT_IDS);
+      return DEFAULT_IDS;
     }
-  }, []);
+  });
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));

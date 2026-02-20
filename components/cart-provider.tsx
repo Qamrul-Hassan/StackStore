@@ -23,17 +23,16 @@ const CartContext = createContext<CartContextType | null>(null);
 const STORAGE_KEY = "stackstore_cart_v2";
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
-
-  useEffect(() => {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return;
+  const [items, setItems] = useState<CartItem[]>(() => {
+    if (typeof window === "undefined") return [];
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
     try {
-      setItems(JSON.parse(raw));
+      return JSON.parse(raw) as CartItem[];
     } catch {
-      setItems([]);
+      return [];
     }
-  }, []);
+  });
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));

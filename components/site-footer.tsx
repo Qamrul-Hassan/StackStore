@@ -52,7 +52,7 @@ export function SiteFooter() {
         <div className="space-y-3">
           <p className="text-[1.55rem] font-semibold leading-none">Download App</p>
           <p className="text-xs text-[#748692]">Scan to open your profile page</p>
-          <div className="grid grid-cols-[96px_1fr] items-start gap-2">
+          <div className="grid grid-cols-[112px_52px] items-start gap-2">
             <a
               href={profileUrl}
               className="overflow-hidden rounded border border-[#748692] bg-white p-1"
@@ -61,15 +61,15 @@ export function SiteFooter() {
               <Image
                 src={qrCodeUrl}
                 alt="QR code to profile page"
-                width={96}
-                height={96}
-                className="h-[96px] w-[96px] object-contain"
+                width={112}
+                height={112}
+                className="h-[112px] w-[112px] object-contain"
                 loading="lazy"
                 unoptimized
                 referrerPolicy="no-referrer"
               />
             </a>
-            <div className="space-y-2">
+            <div className="grid h-[112px] content-between">
               <a
                 href={googlePlayUrl}
                 aria-label="Open Google Play profile link"

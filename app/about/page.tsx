@@ -10,6 +10,7 @@ import {
   Truck,
   Users
 } from "lucide-react";
+import Image from "next/image";
 import { ReactNode, useEffect, useMemo, useState } from "react";
 
 export default function AboutPage() {
@@ -44,11 +45,14 @@ export default function AboutPage() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,rgba(251,133,0,0.22),transparent_34%)]" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_100%,rgba(142,180,194,0.18),transparent_34%)]" />
           <div className="relative h-full min-h-[420px] p-8">
-            <img
+            <Image
               src={aboutStoryImage}
               alt="About Story"
-              className="h-full w-full rounded-xl object-cover"
-              loading="eager"
+              fill
+              unoptimized
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="rounded-xl object-cover"
+              priority
             />
           </div>
         </div>
@@ -155,11 +159,13 @@ function TeamCard({ name, role, image }: { name: string; role: string; image: st
       <div className="relative min-h-[320px] overflow-hidden rounded-2xl border border-white/20 bg-[linear-gradient(135deg,#334155_0%,#64748b_100%)] shadow-[0_24px_32px_-20px_rgba(0,0,0,0.65)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_32px_38px_-22px_rgba(0,0,0,0.8)]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,rgba(255,255,255,0.14),transparent_28%)]" />
         <div className="relative h-full min-h-[320px] p-4">
-          <img
+          <Image
             src={image}
             alt={name}
-            className="h-full w-full rounded-xl object-cover"
-            loading="lazy"
+            fill
+            unoptimized
+            sizes="(max-width: 768px) 100vw, 33vw"
+            className="rounded-xl object-cover"
           />
         </div>
       </div>
@@ -185,7 +191,7 @@ function SupportCard({
   return (
     <div className="rounded-xl border border-white/20 bg-[linear-gradient(170deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] p-5 space-y-2">
       <div className="mx-auto icon-circle">{icon}</div>
-      <h4 className="text-lg font-semibold text-white">{title}</h4>
+      <h3 className="text-lg font-semibold text-white">{title}</h3>
       <p className="text-sm text-zinc-300">{copy}</p>
     </div>
   );

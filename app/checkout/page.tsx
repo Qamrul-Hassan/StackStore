@@ -1,6 +1,7 @@
-﻿"use client";
+"use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -63,8 +64,9 @@ export default function CheckoutPage() {
           <Field label="Town/City*" />
           <Field label="Phone Number*" />
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[#4b5563]">Email Address*</label>
+            <label htmlFor="customer-email" className="text-sm font-medium text-[#4b5563]">Email Address*</label>
             <Input
+              id="customer-email"
               type="email"
               className="h-12 border-[#dce3ea] bg-white/90"
               value={customerEmail}
@@ -84,18 +86,7 @@ export default function CheckoutPage() {
             {cart.items.map((item) => (
               <div key={item.productId} className="flex items-center justify-between gap-4">
                 <div className="flex min-w-0 items-center gap-3">
-                  <div className="relative size-12 shrink-0 overflow-hidden rounded border border-white/70 bg-white/75 shadow-sm">
-                    <img
-                      src={item.imageUrl}
-                      alt={item.name}
-                      className="absolute inset-0 h-full w-full object-cover"
-                      loading="lazy"
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src = IMAGE_FALLBACK;
-                      }}
-                    />
-                  </div>
+                  <CheckoutItemImage src={item.imageUrl} alt={item.name} />
                   <span className="truncate font-medium">{item.name}</span>
                 </div>
                 <span className="font-semibold">${(item.price * item.quantity).toFixed(2)}</span>
@@ -118,7 +109,8 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          <div className="space-y-3 pt-2">
+          <fieldset className="space-y-3 pt-2">
+            <legend className="sr-only">Select payment method</legend>
             <label className="flex items-center gap-2 text-sm font-medium">
               <input
                 type="radio"
@@ -135,7 +127,7 @@ export default function CheckoutPage() {
               />
               Cash on delivery
             </label>
-          </div>
+          </fieldset>
 
           <div className="flex gap-3 pt-1">
             <Input className="h-12 border-white/70 bg-white/80 backdrop-blur-md" placeholder="Coupon Code" />
@@ -162,10 +154,32 @@ export default function CheckoutPage() {
 }
 
 function Field({ label }: { label: string }) {
+  const fieldId = useId();
+
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium text-[#4b5563]">{label}</label>
-      <Input className="h-12 border-[#dce3ea] bg-white/90" />
+      <label htmlFor={fieldId} className="text-sm font-medium text-[#4b5563]">{label}</label>
+      <Input id={fieldId} className="h-12 border-[#dce3ea] bg-white/90" />
+    </div>
+  );
+}
+
+function CheckoutItemImage({ src, alt }: { src: string; alt: string }) {
+  const [safeSrc, setSafeSrc] = useState(src || IMAGE_FALLBACK);
+
+  return (
+    <div className="relative size-12 shrink-0 overflow-hidden rounded border border-white/70 bg-white/75 shadow-sm">
+      <Image
+        src={safeSrc}
+        alt={alt}
+        fill
+        unoptimized
+        sizes="48px"
+        className="object-cover"
+        onError={() => {
+          if (safeSrc !== IMAGE_FALLBACK) setSafeSrc(IMAGE_FALLBACK);
+        }}
+      />
     </div>
   );
 }
