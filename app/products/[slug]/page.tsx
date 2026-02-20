@@ -1,8 +1,51 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductDetailsInteractive } from "@/components/product-details-interactive";
 import { ProductCard } from "@/components/product-card";
 import { fetchCatalogProducts, formatCategory } from "@/lib/catalog";
+import { absoluteUrl } from "@/lib/seo";
+
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const products = await fetchCatalogProducts();
+  const product = products.find((item) => item.slug === slug);
+
+  if (!product) {
+    return {
+      title: "Product Not Found",
+      robots: { index: false, follow: false }
+    };
+  }
+
+  const title = `${product.name}`;
+  const description =
+    product.description || `${product.name} from StackStore. Buy now at great price.`;
+  const canonical = `/products/${product.slug}`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title,
+      description,
+      url: canonical,
+      type: "website",
+      images: product.imageUrl ? [{ url: product.imageUrl, alt: product.name }] : undefined
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: product.imageUrl ? [product.imageUrl] : undefined
+    }
+  };
+}
 
 export default async function ProductDetailsPage({
   params
@@ -22,9 +65,35 @@ export default async function ProductDetailsPage({
   const description =
     product.description ||
     `${product.name} is built with premium materials and practical details for reliable daily performance.`;
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description,
+    image: product.images?.length ? product.images : [product.imageUrl],
+    brand: product.brand ? { "@type": "Brand", name: product.brand } : undefined,
+    category: product.category,
+    sku: product.id,
+    offers: {
+      "@type": "Offer",
+      url: absoluteUrl(`/products/${product.slug}`),
+      priceCurrency: "USD",
+      price: String(product.price),
+      availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+    },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: String(product.rating),
+      reviewCount: String(product.reviews)
+    }
+  };
 
   return (
     <div className="space-y-14 pb-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       <p className="text-sm text-zinc-300">
         Home / {formatCategory(product.category)} / <span className="font-semibold text-white">{product.name}</span>
       </p>

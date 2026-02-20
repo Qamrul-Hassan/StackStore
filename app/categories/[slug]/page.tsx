@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/product-card";
@@ -14,6 +15,61 @@ const CATEGORY_ALIAS: Record<string, string[]> = {
   "groceries-and-pets": ["groceries"],
   "health-and-beauty": ["beauty", "fragrances", "skin-care"]
 };
+
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const normalized = slug.toLowerCase();
+  const products = await fetchCatalogProducts();
+  const categories = extractCategories(products);
+  const categorySlugs = categories.map((category) => toCategorySlug(category));
+  const aliasTargets = CATEGORY_ALIAS[normalized];
+
+  if (
+    normalized !== "all" &&
+    !categorySlugs.includes(normalized) &&
+    !CATEGORY_ALIAS[normalized]
+  ) {
+    return {
+      title: "Category Not Found",
+      robots: { index: false, follow: false }
+    };
+  }
+
+  const items =
+    normalized === "all"
+      ? products
+      : aliasTargets
+        ? products.filter((item) => aliasTargets.includes(toCategorySlug(item.category)))
+        : products.filter((item) => toCategorySlug(item.category) === normalized);
+
+  const pageTitle = normalized === "all" ? "All Products" : readableCategoryTitle(normalized, items[0]?.category);
+  const description =
+    normalized === "all"
+      ? "Browse all products available on StackStore."
+      : `Browse ${pageTitle} products on StackStore.`;
+  const canonical = `/categories/${normalized}`;
+
+  return {
+    title: pageTitle,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title: `${pageTitle} - StackStore`,
+      description,
+      url: canonical,
+      type: "website"
+    },
+    twitter: {
+      card: "summary",
+      title: `${pageTitle} - StackStore`,
+      description
+    }
+  };
+}
 
 export default async function CategoryPage({
   params

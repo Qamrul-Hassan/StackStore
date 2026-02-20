@@ -4,6 +4,7 @@ import { Providers } from "@/app/providers";
 import { BrandShowcase } from "@/components/brand-showcase";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { getSiteUrl } from "@/lib/seo";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -17,8 +18,36 @@ const syne = Syne({
 });
 
 export const metadata: Metadata = {
-  title: "StackStore",
-  description: "Bold, premium e-commerce storefront powered by Next.js"
+  metadataBase: new URL(getSiteUrl()),
+  title: {
+    default: "StackStore | Next Commerce",
+    template: "%s | StackStore"
+  },
+  description: "Bold, premium e-commerce storefront powered by Next.js",
+  keywords: [
+    "StackStore",
+    "ecommerce",
+    "online shopping",
+    "next.js store",
+    "electronics",
+    "fashion"
+  ],
+  alternates: {
+    canonical: "/"
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/",
+    siteName: "StackStore",
+    title: "StackStore | Next Commerce",
+    description: "Bold, premium e-commerce storefront powered by Next.js"
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "StackStore | Next Commerce",
+    description: "Bold, premium e-commerce storefront powered by Next.js"
+  }
 };
 
 export default function RootLayout({

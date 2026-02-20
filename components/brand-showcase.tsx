@@ -48,9 +48,9 @@ export function BrandShowcase() {
         <div className="pointer-events-none absolute -right-20 -bottom-20 size-56 rounded-full bg-[#8EB4C2]/18 blur-3xl" />
 
         <div className="relative flex flex-wrap items-center justify-between gap-3">
-          <p className="font-display text-base font-semibold uppercase tracking-[0.14em] text-[#dbe5f2]">
+          <h2 className="font-display text-base font-semibold uppercase tracking-[0.14em] text-[#dbe5f2]">
             Trusted Brands
-          </p>
+          </h2>
           <p className="text-sm text-[#9fb0c2]">Powering style, tech and performance</p>
         </div>
 
