@@ -6,6 +6,153 @@ type FlyOptions = {
   imageUrl?: string;
 };
 
+const DEFAULT_FLY_DURATION_MS = 950;
+
+export function animateRemoveFromTarget(
+  targetSelector: string,
+  options: FlyOptions = {}
+) {
+  if (typeof window === "undefined" || typeof document === "undefined") return;
+
+  const target = document.querySelector<HTMLElement>(targetSelector);
+  if (!target) return;
+
+  const rect = target.getBoundingClientRect();
+  const kind = options.kind ?? "dot";
+  const size = options.size ?? 14;
+  const durationMs = options.durationMs ?? 980;
+  const color = options.color ?? "#F92D0A";
+
+  const node = document.createElement("span");
+  const rope = document.createElement("span");
+  const nodeSize = kind === "product" ? Math.max(34, size * 2.2) : Math.max(14, size);
+  const startX = rect.left + rect.width / 2;
+  const startY = rect.top + rect.height / 2;
+  node.style.position = "fixed";
+  node.style.left = `${startX - nodeSize / 2}px`;
+  node.style.top = `${startY - nodeSize / 2}px`;
+  node.style.width = `${nodeSize}px`;
+  node.style.height = `${nodeSize}px`;
+  node.style.zIndex = "80";
+  node.style.pointerEvents = "none";
+  node.style.display = "grid";
+  node.style.placeItems = "center";
+  node.style.willChange = "transform, opacity";
+
+  if (kind === "heart") {
+    node.textContent = "\u2665";
+    node.style.color = "#ff3b63";
+    node.style.fontSize = `${size + 10}px`;
+    node.style.lineHeight = "1";
+    node.style.textShadow = "0 0 14px rgba(255,76,120,0.6)";
+  } else if (kind === "product") {
+    node.style.borderRadius = "10px";
+    node.style.background = "linear-gradient(145deg, rgba(255,255,255,0.96), rgba(226,232,240,0.95))";
+    node.style.border = "1px solid rgba(255,255,255,0.85)";
+    node.style.boxShadow = "0 12px 24px -14px rgba(33,14,20,0.7)";
+  } else {
+    node.style.borderRadius = "9999px";
+    node.style.background = color;
+    node.style.boxShadow = "0 0 0 6px rgba(249,45,10,0.15)";
+  }
+
+  rope.style.position = "fixed";
+  rope.style.left = `${startX}px`;
+  rope.style.top = `${startY}px`;
+  rope.style.width = "1px";
+  rope.style.height = "2px";
+  rope.style.transformOrigin = "0 50%";
+  rope.style.pointerEvents = "none";
+  rope.style.zIndex = "79";
+  rope.style.borderRadius = "9999px";
+  rope.style.background =
+    "linear-gradient(90deg, rgba(255,255,255,0.55), rgba(251,133,0,0.85), rgba(249,45,10,0.25))";
+  rope.style.filter = "drop-shadow(0 0 6px rgba(249,45,10,0.45))";
+
+  document.body.appendChild(rope);
+  document.body.appendChild(node);
+
+  const start = performance.now();
+  const side = Math.random() > 0.5 ? 1 : -1;
+  const driftX = side * (46 + Math.random() * 62);
+  const driftY = 140 + Math.random() * 120;
+  const spin = side * (20 + Math.random() * 24);
+  const waveAmp = 10 + Math.random() * 14;
+
+  const popBurst = (x: number, y: number) => {
+    const burstCount = 12;
+    for (let i = 0; i < burstCount; i += 1) {
+      const p = document.createElement("span");
+      const a = (Math.PI * 2 * i) / burstCount;
+      const dx = Math.cos(a) * (30 + Math.random() * 32);
+      const dy = Math.sin(a) * (30 + Math.random() * 32);
+      const s = 5 + Math.random() * 4;
+
+      p.style.position = "fixed";
+      p.style.left = `${x - s / 2}px`;
+      p.style.top = `${y - s / 2}px`;
+      p.style.width = `${s}px`;
+      p.style.height = `${s}px`;
+      p.style.borderRadius = "9999px";
+      p.style.pointerEvents = "none";
+      p.style.zIndex = "81";
+      p.style.background = i % 2 === 0 ? "#FB8500" : "#F92D0A";
+      p.style.boxShadow = "0 0 10px rgba(249,45,10,0.7)";
+      p.style.willChange = "transform, opacity";
+      document.body.appendChild(p);
+
+      const pStart = performance.now();
+      const pDur = 360 + Math.random() * 180;
+      const pTick = (now: number) => {
+        const t = Math.min(1, (now - pStart) / pDur);
+        const ease = 1 - Math.pow(1 - t, 3);
+        p.style.transform = `translate3d(${dx * ease}px, ${dy * ease}px, 0) scale(${1.18 - t * 0.78})`;
+        p.style.opacity = `${1 - t}`;
+        if (t < 1) {
+          window.requestAnimationFrame(pTick);
+        } else {
+          p.remove();
+        }
+      };
+      window.requestAnimationFrame(pTick);
+    }
+  };
+
+  const tick = (now: number) => {
+    const t = Math.min(1, (now - start) / durationMs);
+    const ease = 1 - Math.pow(1 - t, 3);
+    const wave = Math.sin(t * Math.PI * 2.3) * waveAmp * (1 - t * 0.26);
+    const x = driftX * ease + wave;
+    const y = driftY * ease;
+    const growAtEnd = Math.max(0, (t - 0.72) / 0.28) * 0.85;
+    const scale = 0.95 - 0.2 * ease + growAtEnd;
+    const opacity = 1 - ease;
+    const currentX = startX + x;
+    const currentY = startY + y;
+
+    const ropeDx = currentX - startX;
+    const ropeDy = currentY - startY;
+    const ropeLen = Math.max(2, Math.hypot(ropeDx, ropeDy));
+    const ropeAngle = (Math.atan2(ropeDy, ropeDx) * 180) / Math.PI;
+
+    node.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale}) rotate(${spin * ease}deg)`;
+    node.style.opacity = `${Math.max(0, opacity)}`;
+    rope.style.width = `${ropeLen}px`;
+    rope.style.transform = `rotate(${ropeAngle}deg)`;
+    rope.style.opacity = `${Math.max(0, 0.88 - ease * 0.92)}`;
+
+    if (t < 1) {
+      window.requestAnimationFrame(tick);
+    } else {
+      popBurst(currentX, currentY);
+      node.remove();
+      rope.remove();
+    }
+  };
+
+  window.requestAnimationFrame(tick);
+}
+
 export function animateFlyToTarget(
   source: HTMLElement,
   targetSelector: string,
@@ -20,9 +167,7 @@ export function animateFlyToTarget(
   const targetRect = target.getBoundingClientRect();
   const size = options.size ?? 14;
   const kind = options.kind ?? "dot";
-  const durationMs =
-    options.durationMs ??
-    (kind === "heart" ? 6000 : kind === "product" ? 1450 : 900);
+  const durationMs = options.durationMs ?? DEFAULT_FLY_DURATION_MS;
   const color = options.color ?? "#F92D0A";
 
   const startX = sourceRect.left + sourceRect.width / 2;

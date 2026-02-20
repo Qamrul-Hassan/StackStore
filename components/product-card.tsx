@@ -7,7 +7,7 @@ import { Eye, Heart, Trash2 } from "lucide-react";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 import { useWishlist } from "@/components/wishlist-provider";
 import { IMAGE_FALLBACK } from "@/lib/image-placeholder";
-import { animateFlyToTarget } from "@/lib/fly-to-target";
+import { animateFlyToTarget, animateRemoveFromTarget } from "@/lib/fly-to-target";
 
 type ProductCardType = {
   id: string;
@@ -30,6 +30,8 @@ export function ProductCard({ product }: { product: ProductCardType }) {
   const hydrated = React.useSyncExternalStore(() => () => {}, () => true, () => false);
   const productId = String(product.id);
   const wishlistKey = String(product.slug || product.id);
+  const shouldEagerLoad =
+    productId === "1" || wishlistKey === "havit-hv-g92-gamepad" || wishlistKey === "dj-1";
   const inWishlist = hydrated && (wishlist.has(wishlistKey) || wishlist.has(productId));
   const [selectedColor, setSelectedColor] = React.useState<string | null>(null);
   const cardImage = product.images?.[0] ?? product.imageUrl;
@@ -65,6 +67,11 @@ export function ProductCard({ product }: { product: ProductCardType }) {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                animateRemoveFromTarget('[data-fly-target="wishlist"]', {
+                  color: "#F92D0A",
+                  size: 13,
+                  kind: "heart"
+                });
                 product.onRemove?.(wishlistKey);
               }}
               className="grid size-8 place-items-center rounded-full border border-white bg-white/95 text-[#F92D0A] shadow-[0_10px_16px_-12px_rgba(33,14,20,0.9)] transition hover:scale-105 hover:border-[#F92D0A]/55"
@@ -81,6 +88,11 @@ export function ProductCard({ product }: { product: ProductCardType }) {
                 if (inWishlist) {
                   wishlist.remove(wishlistKey);
                   wishlist.remove(productId);
+                  animateRemoveFromTarget('[data-fly-target="wishlist"]', {
+                    color: "#F92D0A",
+                    size: 13,
+                    kind: "heart"
+                  });
                 } else {
                   wishlist.add(wishlistKey);
                 }
@@ -117,6 +129,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
               alt={product.name}
               fill
               unoptimized
+              loading={shouldEagerLoad ? "eager" : "lazy"}
               sizes="(max-width: 640px) 90vw, (max-width: 1024px) 42vw, 24vw"
               className="object-contain p-2 transition duration-500 group-hover:scale-110"
               onError={() => {

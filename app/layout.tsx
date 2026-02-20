@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Outfit, Syne } from "next/font/google";
 import { Providers } from "@/app/providers";
+import { BrandShowcase } from "@/components/brand-showcase";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
@@ -34,6 +35,7 @@ export default function RootLayout({
           <main className="relative main-cart-bg mx-auto max-w-6xl px-4 pb-8 pt-0 md:px-6">
             {children}
           </main>
+          <BrandShowcase />
           <SiteFooter />
         </Providers>
       </body>

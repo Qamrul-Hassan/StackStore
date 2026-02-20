@@ -3,14 +3,22 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { useCart } from "@/components/cart-provider";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { IMAGE_FALLBACK } from "@/lib/image-placeholder";
+import { animateRemoveFromTarget } from "@/lib/fly-to-target";
 
 export default function CartPage() {
   const cart = useCart();
+  const hydrated = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+  const visibleItems = hydrated ? cart.items : [];
+  const visibleTotal = hydrated ? cart.total : 0;
 
   return (
     <div className="space-y-10 pb-8">
@@ -31,14 +39,14 @@ export default function CartPage() {
               </tr>
             </thead>
             <tbody>
-              {cart.items.length === 0 ? (
+              {visibleItems.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-10 text-center text-zinc-600">
                     Your cart is empty. Add products from the shop.
                   </td>
                 </tr>
               ) : (
-                cart.items.map((item) => (
+                visibleItems.map((item) => (
                   <tr key={item.productId} className="border-b border-[#e7edf4] text-[#210E14]">
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-3">
@@ -61,7 +69,14 @@ export default function CartPage() {
                     </td>
                     <td className="px-6 py-5 text-center">
                       <button
-                        onClick={() => cart.removeItem(item.productId)}
+                        onClick={() => {
+                          cart.removeItem(item.productId);
+                          animateRemoveFromTarget('[data-fly-target="cart"]', {
+                            color: "#FB8500",
+                            size: 14,
+                            kind: "product"
+                          });
+                        }}
                         className="inline-flex items-center justify-center rounded border border-[#e5e7eb] bg-white p-2 transition hover:border-[#F92D0A] hover:bg-[#F92D0A] hover:text-white"
                         aria-label="Remove item"
                       >
@@ -76,10 +91,10 @@ export default function CartPage() {
         </div>
 
         <div className="divide-y divide-[#e7edf4] md:hidden">
-          {cart.items.length === 0 ? (
+          {visibleItems.length === 0 ? (
             <div className="px-5 py-10 text-center text-zinc-600">Your cart is empty. Add products from the shop.</div>
           ) : (
-            cart.items.map((item) => (
+            visibleItems.map((item) => (
               <div key={item.productId} className="space-y-3 px-4 py-4 text-[#210E14]">
                 <div className="flex items-start gap-3">
                   <div className="flex min-w-0 items-center gap-3">
@@ -123,7 +138,14 @@ export default function CartPage() {
                     </p>
                   </div>
                   <button
-                    onClick={() => cart.removeItem(item.productId)}
+                    onClick={() => {
+                      cart.removeItem(item.productId);
+                      animateRemoveFromTarget('[data-fly-target="cart"]', {
+                        color: "#FB8500",
+                        size: 14,
+                        kind: "product"
+                      });
+                    }}
                     className="inline-flex h-10 w-10 items-center justify-center rounded border border-[#e5e7eb] bg-white transition hover:border-[#F92D0A] hover:bg-[#F92D0A] hover:text-white"
                     aria-label="Remove item"
                   >
@@ -146,7 +168,7 @@ export default function CartPage() {
           variant="outline"
           className="h-12 w-full border-white/50 bg-white/10 px-8 text-white backdrop-blur-sm normal-case tracking-normal hover:bg-white/20 sm:w-auto"
           onClick={() => {
-            cart.items.forEach((item) => cart.updateQuantity(item.productId, Math.max(1, item.quantity)));
+            visibleItems.forEach((item) => cart.updateQuantity(item.productId, Math.max(1, item.quantity)));
           }}
         >
           Update Cart
@@ -166,7 +188,7 @@ export default function CartPage() {
           <div className="mt-4 space-y-4 text-[#210E14]">
             <div className="flex items-center justify-between border-b border-[#e5e7eb] pb-3">
               <span>Subtotal:</span>
-              <span>${cart.total.toFixed(2)}</span>
+              <span>${visibleTotal.toFixed(2)}</span>
             </div>
             <div className="flex items-center justify-between border-b border-[#e5e7eb] pb-3">
               <span>Shipping:</span>
@@ -174,7 +196,7 @@ export default function CartPage() {
             </div>
             <div className="flex items-center justify-between text-lg font-semibold">
               <span>Total:</span>
-              <span>${cart.total.toFixed(2)}</span>
+              <span>${visibleTotal.toFixed(2)}</span>
             </div>
           </div>
           <Link href="/checkout" className="mt-6 inline-block w-full sm:w-auto">

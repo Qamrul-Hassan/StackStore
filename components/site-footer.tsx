@@ -18,6 +18,9 @@ export function SiteFooter() {
           <p className="text-sm text-zinc-300">Get 10% off your first order</p>
           <div className="flex h-11 items-center justify-between rounded border border-[#748692] bg-black/25 px-3 transition focus-within:border-[#FB8500]">
             <input
+              id="footer-subscribe-email"
+              name="email"
+              autoComplete="email"
               className="w-full bg-transparent text-sm outline-none placeholder:text-zinc-500"
               placeholder="Enter your email"
             />

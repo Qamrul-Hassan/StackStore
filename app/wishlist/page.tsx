@@ -1,19 +1,46 @@
 "use client";
 
+import { useMemo } from "react";
 import { ProductCard } from "@/components/product-card";
 import { useCart } from "@/components/cart-provider";
 import { useDataContext } from "@/components/data-context";
 import { useWishlist } from "@/components/wishlist-provider";
 import { storeItems } from "@/lib/store-data";
 
+function toComparableKeys(value: string) {
+  const key = String(value).trim();
+  const keys = [key];
+  if (key.startsWith("dj-")) keys.push(key.replace(/^dj-/, ""));
+  return keys;
+}
+
 export default function WishlistPage() {
   const wishlist = useWishlist();
   const cart = useCart();
   const { products } = useDataContext();
+  const wishlistKeySet = useMemo(
+    () => new Set(wishlist.ids.flatMap((id) => toComparableKeys(String(id)))),
+    [wishlist.ids]
+  );
 
-  const source = products.length > 0 ? products : storeItems;
-  const isWishlisted = (item: { id: string; slug?: string }) =>
-    wishlist.ids.includes(String(item.id)) || (item.slug ? wishlist.ids.includes(String(item.slug)) : false);
+  const source = useMemo(() => {
+    const merged = [...products, ...storeItems];
+    const seen = new Set<string>();
+    return merged.filter((item) => {
+      const idKey = String(item.id);
+      const slugKey = String(item.slug ?? "");
+      if (seen.has(idKey) || (slugKey && seen.has(slugKey))) return false;
+      seen.add(idKey);
+      if (slugKey) seen.add(slugKey);
+      return true;
+    });
+  }, [products]);
+
+  const isWishlisted = (item: { id: string; slug?: string }) => {
+    const idKeys = toComparableKeys(String(item.id));
+    const slugKeys = item.slug ? toComparableKeys(String(item.slug)) : [];
+    return [...idKeys, ...slugKeys].some((key) => wishlistKeySet.has(key));
+  };
   const list = source.filter((item) => isWishlisted({ id: String(item.id), slug: item.slug }));
   const justForYou = source.filter((item) => !isWishlisted({ id: String(item.id), slug: item.slug })).slice(0, 8);
 
@@ -56,9 +83,10 @@ export default function WishlistPage() {
               product={{
                 ...item,
                 removable: true,
-                onRemove: (id) => {
-                  wishlist.remove(String(id));
+                onRemove: () => {
+                  if (item.slug) wishlist.remove(String(item.slug));
                   wishlist.remove(String(item.id));
+                  if (String(item.id).startsWith("dj-")) wishlist.remove(String(item.id).replace(/^dj-/, ""));
                 }
               }}
             />
