@@ -55,15 +55,15 @@ export function SiteFooter() {
           <div className="grid grid-cols-[112px_52px] items-start gap-2">
             <a
               href={profileUrl}
-              className="overflow-hidden rounded border border-[#748692] bg-white p-1"
+              className="grid h-[112px] w-[112px] place-items-center overflow-hidden rounded border border-[#748692] bg-white"
               aria-label="Open profile page"
             >
               <Image
                 src={qrCodeUrl}
                 alt="QR code to profile page"
-                width={112}
-                height={112}
-                className="h-[112px] w-[112px] object-contain"
+                width={104}
+                height={104}
+                className="h-[104px] w-[104px] object-contain"
                 loading="lazy"
                 unoptimized
                 referrerPolicy="no-referrer"

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ReactNode } from "react";
+import { ReactNode, useSyncExternalStore } from "react";
 import { ChevronDown, Heart, Search, ShoppingCart, User } from "lucide-react";
 import { useCart } from "@/components/cart-provider";
 import { useWishlist } from "@/components/wishlist-provider";
@@ -20,6 +20,11 @@ export function SiteHeader() {
   const pathname = usePathname();
   const cart = useCart();
   const wishlist = useWishlist();
+  const hydrated = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
   const cartCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
@@ -73,8 +78,8 @@ export function SiteHeader() {
               <Search className="size-3.5" />
             </button>
           </form>
-          <IconWrap icon={<Heart className="size-5" />} badge={wishlist.count} href="/wishlist" flyTarget="wishlist" />
-          <IconWrap icon={<ShoppingCart className="size-5" />} badge={cartCount} href="/cart" flyTarget="cart" />
+          <IconWrap icon={<Heart className="size-5" />} badge={hydrated ? wishlist.count : 0} href="/wishlist" flyTarget="wishlist" />
+          <IconWrap icon={<ShoppingCart className="size-5" />} badge={hydrated ? cartCount : 0} href="/cart" flyTarget="cart" />
           <IconWrap icon={<User className="size-5" />} href="/account" />
         </div>
       </div>

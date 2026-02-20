@@ -27,9 +27,10 @@ type ProductCardType = {
 
 export function ProductCard({ product }: { product: ProductCardType }) {
   const wishlist = useWishlist();
+  const hydrated = React.useSyncExternalStore(() => () => {}, () => true, () => false);
   const productId = String(product.id);
   const wishlistKey = String(product.slug || product.id);
-  const inWishlist = wishlist.has(wishlistKey) || wishlist.has(productId);
+  const inWishlist = hydrated && (wishlist.has(wishlistKey) || wishlist.has(productId));
   const [selectedColor, setSelectedColor] = React.useState<string | null>(null);
   const cardImage = product.images?.[0] ?? product.imageUrl;
   const [imageSrc, setImageSrc] = React.useState(cardImage);

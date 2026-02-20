@@ -204,7 +204,7 @@ export default function HomePage() {
               </Link>
             </div>
             <div className="relative h-48 sm:h-60 md:h-[350px]">
-              <Image src={heroImage} alt={activeHeroProduct.name} fill unoptimized className="object-contain" />
+              <Image src={heroImage} alt={activeHeroProduct.name} fill unoptimized priority loading="eager" className="object-contain" />
             </div>
           </div>
           <div className="mt-2 flex items-center justify-center gap-2">
