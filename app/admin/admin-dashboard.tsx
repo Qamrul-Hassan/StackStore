@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { signOut } from "next-auth/react";
 import { ProductDTO } from "@/lib/serializers";
 import { Button } from "@/components/ui/button";
@@ -61,6 +61,25 @@ export function AdminDashboard({ initialProducts, initialOrders }: Props) {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const isEditing = useMemo(() => Boolean(form.id), [form.id]);
+
+  useEffect(() => {
+    const sync = async () => {
+      const res = await fetch("/api/admin/dashboard", { cache: "no-store" });
+      if (!res.ok) return;
+      const payload = (await res.json()) as {
+        products: ProductDTO[];
+        orders: Props["initialOrders"];
+      };
+      setProducts(payload.products);
+      setOrders(payload.orders);
+    };
+
+    const id = window.setInterval(() => {
+      void sync();
+    }, 8000);
+
+    return () => window.clearInterval(id);
+  }, []);
 
   function setField<K extends keyof ProductFormState>(key: K, value: ProductFormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));

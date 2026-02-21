@@ -26,6 +26,16 @@ export default function CartPage() {
         Home / <span className="font-semibold text-white">Cart</span>
       </p>
 
+      {!cart.isAuthenticated ? (
+        <div className="rounded-xl border border-[#FB8500]/45 bg-[#FB8500]/10 px-4 py-3 text-sm text-white">
+          You are using guest cart.{" "}
+          <Link href="/account" className="font-semibold underline">
+            Login or Sign Up
+          </Link>{" "}
+          to keep cart synced with your account.
+        </div>
+      ) : null}
+
       <div className="glass-panel section-shell section-single-cart cart-left overflow-hidden rounded-2xl">
         <div className="hidden overflow-x-auto md:block">
           <table className="w-full min-w-[720px] text-left">

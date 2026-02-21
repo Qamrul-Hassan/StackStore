@@ -1,10 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useSession } from "next-auth/react";
 
 type WishlistContextType = {
   ids: string[];
   count: number;
+  isAuthenticated: boolean;
   has: (id: string) => boolean;
   add: (id: string) => void;
   remove: (id: string) => void;
@@ -38,6 +40,8 @@ function normalizeIds(input: unknown): string[] {
 }
 
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
+  const { status } = useSession();
+  const isAuthenticated = status === "authenticated";
   const [ids, setIds] = useState<string[]>(() => {
     if (typeof window === "undefined") return DEFAULT_IDS;
     const raw = window.localStorage.getItem(STORAGE_KEY);
@@ -49,15 +53,62 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       return DEFAULT_IDS;
     }
   });
+  const hasLoadedRemoteRef = useRef(false);
+  const syncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
   }, [ids]);
 
+  useEffect(() => {
+    if (!isAuthenticated || hasLoadedRemoteRef.current) return;
+
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await fetch("/api/user/wishlist", { cache: "no-store" });
+        if (!res.ok) return;
+        const payload = (await res.json()) as { ids?: string[] };
+        const remote = normalizeIds(payload.ids);
+        setIds((prev) => Array.from(new Set([...remote, ...prev])));
+      } finally {
+        if (!cancelled) hasLoadedRemoteRef.current = true;
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !hasLoadedRemoteRef.current) return;
+    if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
+
+    syncTimeoutRef.current = setTimeout(() => {
+      void fetch("/api/user/wishlist", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids })
+      });
+    }, 240);
+
+    return () => {
+      if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
+    };
+  }, [ids, isAuthenticated]);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      hasLoadedRemoteRef.current = false;
+    }
+  }, [status]);
+
   const value = useMemo(
     () => ({
       ids,
       count: ids.length,
+      isAuthenticated,
       has(id: string) {
         return ids.includes(normalizeId(id));
       },
@@ -77,7 +128,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         setIds([]);
       }
     }),
-    [ids]
+    [ids, isAuthenticated]
   );
 
   return <WishlistContext.Provider value={value}>{children}</WishlistContext.Provider>;

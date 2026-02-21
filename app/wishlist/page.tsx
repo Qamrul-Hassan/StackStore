@@ -6,6 +6,7 @@ import { useCart } from "@/components/cart-provider";
 import { useDataContext } from "@/components/data-context";
 import { useWishlist } from "@/components/wishlist-provider";
 import { storeItems } from "@/lib/store-data";
+import Link from "next/link";
 
 function toComparableKeys(value: string) {
   const key = String(value).trim();
@@ -70,6 +71,16 @@ export default function WishlistPage() {
           Move All To Bag
         </button>
       </div>
+
+      {!wishlist.isAuthenticated ? (
+        <div className="rounded-xl border border-[#FB8500]/45 bg-[#FB8500]/10 px-4 py-3 text-sm text-white">
+          You are using guest wishlist.{" "}
+          <Link href="/account" className="font-semibold underline">
+            Login or Sign Up
+          </Link>{" "}
+          to keep wishlist synced with your account.
+        </div>
+      ) : null}
 
       {list.length === 0 ? (
         <div className="glass-panel section-single-cart cart-left rounded border border-dashed border-[#d1d5db] p-10 text-center text-zinc-500">
