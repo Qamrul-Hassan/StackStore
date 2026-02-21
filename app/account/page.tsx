@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,7 @@ async function readSafeJson<T>(res: Response): Promise<T | null> {
   }
 }
 
-export default function AccountPage() {
+function AccountPageContent() {
   const searchParams = useSearchParams();
   const { data: session, status } = useSession();
   const [mode, setMode] = useState<"signin" | "signup">("signup");
@@ -254,5 +254,27 @@ export default function AccountPage() {
         </div>
       )}
     </div>
+  );
+}
+
+
+function AccountPageFallback() {
+  return (
+    <div className="space-y-6 pb-8">
+      <p className="text-sm text-zinc-300">
+        Home / <span className="font-semibold text-white">My Account</span>
+      </p>
+      <div className="glass-panel section-shell section-single-cart cart-right rounded-2xl p-8 text-zinc-500">
+        Loading account...
+      </div>
+    </div>
+  );
+}
+
+export default function AccountPage() {
+  return (
+    <Suspense fallback={<AccountPageFallback />}>
+      <AccountPageContent />
+    </Suspense>
   );
 }
