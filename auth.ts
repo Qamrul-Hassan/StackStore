@@ -21,7 +21,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const user = await db.user.findUnique({ where: { email } });
         if (!user) return null;
-        if (!(user as { emailVerified?: Date | null }).emailVerified) return null;
+        // Admin login is allowed without email verification for local management access.
+        if (user.role !== "ADMIN" && !(user as { emailVerified?: Date | null }).emailVerified) return null;
 
         const valid = await bcrypt.compare(password, user.passwordHash);
         if (!valid) return null;

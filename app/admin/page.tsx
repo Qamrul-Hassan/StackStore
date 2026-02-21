@@ -51,6 +51,7 @@ export default async function AdminPage() {
 
   return (
     <AdminDashboard
+      adminEmail={session.user?.email ?? ""}
       initialProducts={initialProducts.map(toProductDTO)}
       initialOrders={initialOrders}
     />

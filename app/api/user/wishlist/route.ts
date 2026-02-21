@@ -13,6 +13,10 @@ export async function GET() {
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  const user = await db.user.findUnique({ where: { id: userId } });
+  if (!user) {
+    return NextResponse.json({ error: "Session is stale. Please sign in again." }, { status: 401 });
+  }
 
   const items = await db.userWishlistItem.findMany({
     where: { userId },
@@ -27,6 +31,10 @@ export async function PUT(req: NextRequest) {
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  const user = await db.user.findUnique({ where: { id: userId } });
+  if (!user) {
+    return NextResponse.json({ error: "Session is stale. Please sign in again." }, { status: 401 });
+  }
 
   const json = await req.json();
   const parsed = payloadSchema.safeParse(json);
@@ -36,15 +44,18 @@ export async function PUT(req: NextRequest) {
 
   const uniqueIds = Array.from(new Set(parsed.data.ids.map((id) => id.trim()).filter(Boolean)));
 
-  await db.$transaction([
-    db.userWishlistItem.deleteMany({ where: { userId } }),
-    ...uniqueIds.map((productId) =>
-      db.userWishlistItem.create({
-        data: { userId, productId }
-      })
-    )
-  ]);
+  try {
+    await db.$transaction([
+      db.userWishlistItem.deleteMany({ where: { userId } }),
+      ...uniqueIds.map((productId) =>
+        db.userWishlistItem.create({
+          data: { userId, productId }
+        })
+      )
+    ]);
+  } catch {
+    return NextResponse.json({ error: "Failed to save wishlist. Please re-login." }, { status: 409 });
+  }
 
   return NextResponse.json({ ok: true });
 }
-

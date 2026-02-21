@@ -21,6 +21,10 @@ export async function GET() {
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  const user = await db.user.findUnique({ where: { id: userId } });
+  if (!user) {
+    return NextResponse.json({ error: "Session is stale. Please sign in again." }, { status: 401 });
+  }
 
   const items = await db.userCartItem.findMany({
     where: { userId },
@@ -44,6 +48,10 @@ export async function PUT(req: NextRequest) {
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  const user = await db.user.findUnique({ where: { id: userId } });
+  if (!user) {
+    return NextResponse.json({ error: "Session is stale. Please sign in again." }, { status: 401 });
+  }
 
   const json = await req.json();
   const parsed = payloadSchema.safeParse(json);
@@ -51,22 +59,25 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "Invalid cart payload" }, { status: 400 });
   }
 
-  await db.$transaction([
-    db.userCartItem.deleteMany({ where: { userId } }),
-    ...parsed.data.items.map((item) =>
-      db.userCartItem.create({
-        data: {
-          userId,
-          productId: item.productId,
-          name: item.name,
-          price: item.price,
-          imageUrl: item.imageUrl,
-          quantity: item.quantity
-        }
-      })
-    )
-  ]);
+  try {
+    await db.$transaction([
+      db.userCartItem.deleteMany({ where: { userId } }),
+      ...parsed.data.items.map((item) =>
+        db.userCartItem.create({
+          data: {
+            userId,
+            productId: item.productId,
+            name: item.name,
+            price: item.price,
+            imageUrl: item.imageUrl,
+            quantity: item.quantity
+          }
+        })
+      )
+    ]);
+  } catch {
+    return NextResponse.json({ error: "Failed to save cart. Please re-login." }, { status: 409 });
+  }
 
   return NextResponse.json({ ok: true });
 }
-
