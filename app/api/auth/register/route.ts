@@ -24,6 +24,12 @@ function getPasswordValidation(password: string) {
 
 export async function POST(req: NextRequest) {
   try {
+    if (!process.env.DATABASE_URL) {
+      return NextResponse.json(
+        { error: "Server database is not configured. Set DATABASE_URL in environment." },
+        { status: 500 }
+      );
+    }
     const json = await req.json();
     const parsed = registerSchema.safeParse(json);
     if (!parsed.success) {
@@ -79,7 +85,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true, message: "Verification email sent." });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unexpected signup error.";
+    const raw = error instanceof Error ? error.message : "Unexpected signup error.";
+    const message = raw.includes("Environment variable not found: DATABASE_URL")
+      ? "Server database is not configured. Set DATABASE_URL in environment."
+      : raw;
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

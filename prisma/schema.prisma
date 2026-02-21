@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -104,3 +104,4 @@ model UserWishlistItem {
   @@unique([userId, productId])
   @@index([userId])
 }
+

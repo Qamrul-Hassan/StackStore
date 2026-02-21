@@ -15,24 +15,28 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: {}
       },
       async authorize(credentials) {
-        const email = String(credentials.email ?? "");
-        const password = String(credentials.password ?? "");
-        if (!email || !password) return null;
+        try {
+          const email = String(credentials.email ?? "");
+          const password = String(credentials.password ?? "");
+          if (!email || !password) return null;
 
-        const user = await db.user.findUnique({ where: { email } });
-        if (!user) return null;
-        // Admin login is allowed without email verification for local management access.
-        if (user.role !== "ADMIN" && !(user as { emailVerified?: Date | null }).emailVerified) return null;
+          const user = await db.user.findUnique({ where: { email } });
+          if (!user) return null;
+          // Admin login is allowed without email verification for local management access.
+          if (user.role !== "ADMIN" && !(user as { emailVerified?: Date | null }).emailVerified) return null;
 
-        const valid = await bcrypt.compare(password, user.passwordHash);
-        if (!valid) return null;
+          const valid = await bcrypt.compare(password, user.passwordHash);
+          if (!valid) return null;
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role
-        };
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role
+          };
+        } catch {
+          return null;
+        }
       }
     })
   ],
