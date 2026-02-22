@@ -24,8 +24,8 @@ export const checkoutSchema = z.object({
 export const contactSchema = z.object({
   name: z.string().trim().min(2).max(80),
   email: z.string().trim().email(),
-  phone: z.string().trim().min(7).max(25),
-  message: z.string().trim().min(10).max(2000)
+  phone: z.string().trim().min(5).max(30),
+  message: z.string().trim().min(2).max(2000)
 });
 
 export type ProductInput = z.infer<typeof productInputSchema>;

@@ -7,7 +7,14 @@ export async function POST(req: NextRequest) {
     const json = await req.json();
     const parsed = contactSchema.safeParse(json);
     if (!parsed.success) {
-      return NextResponse.json({ error: "Invalid contact form data." }, { status: 400 });
+      const firstIssue = parsed.error.issues[0];
+      const field = firstIssue?.path?.[0];
+      const detail = firstIssue?.message ?? "Invalid input.";
+      const fieldLabel = typeof field === "string" ? field : "form";
+      return NextResponse.json(
+        { error: `Invalid ${fieldLabel}: ${detail}` },
+        { status: 400 }
+      );
     }
 
     const ownerEmail =
