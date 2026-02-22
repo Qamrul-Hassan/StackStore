@@ -29,6 +29,7 @@ function getMailConfig() {
   const smtpUser = process.env.SMTP_USER;
   const smtpPass = process.env.SMTP_PASS;
   const smtpSecure = process.env.SMTP_SECURE === "true";
+  const hasAnySmtpField = Boolean(smtpHost || smtpPortRaw || smtpUser || smtpPass);
 
   if (from && smtpHost && smtpPortRaw && smtpUser && smtpPass) {
     const smtpPort = Number(smtpPortRaw);
@@ -47,6 +48,14 @@ function getMailConfig() {
       smtpUser,
       smtpPass,
       smtpSecure
+    };
+  }
+
+  if (hasAnySmtpField) {
+    return {
+      ok: false as const,
+      message:
+        "Incomplete SMTP configuration. Set all: SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, and EMAIL_FROM."
     };
   }
 
@@ -217,12 +226,8 @@ export async function sendContactEmails(input: {
   });
 
   if (!customerMail.ok) {
-    return {
-      ok: true as const,
-      customerReplySent: false as const,
-      warning: customerMail.message
-    };
+    return { ok: false as const, message: customerMail.message };
   }
 
-  return { ok: true as const, customerReplySent: true as const };
+  return { ok: true as const };
 }
