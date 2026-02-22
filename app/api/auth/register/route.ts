@@ -4,6 +4,7 @@ import crypto from "crypto";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { sendVerificationEmail } from "@/lib/email";
+import { env } from "@/lib/env";
 
 const registerSchema = z.object({
   name: z.string().trim().min(2).max(80),
@@ -71,15 +72,16 @@ export async function POST(req: NextRequest) {
       } as never
     });
 
-    const mail = await sendVerificationEmail(email, token, req.nextUrl.origin);
+    const mail = await sendVerificationEmail(email, token, env.appUrl || req.nextUrl.origin);
     if (!mail.ok) {
+      const isProd = process.env.NODE_ENV === "production";
       return NextResponse.json(
         {
-          ok: true,
-          warning: mail.message,
-          verifyUrl: mail.verifyUrl
+          error: isProd
+            ? "Account created, but verification email could not be sent. Configure email provider and use Resend Verification."
+            : `Account created, but verification email could not be sent. ${mail.message}`
         },
-        { status: 202 }
+        { status: 500 }
       );
     }
 

@@ -20,7 +20,8 @@ export function animateRemoveFromTarget(
   const rect = target.getBoundingClientRect();
   const kind = options.kind ?? "dot";
   const size = options.size ?? 14;
-  const durationMs = options.durationMs ?? 980;
+  // Keep close to add-effect speed, just a little slower.
+  const durationMs = options.durationMs ?? 1180;
   const color = options.color ?? "#F92D0A";
 
   const node = document.createElement("span");
@@ -73,20 +74,54 @@ export function animateRemoveFromTarget(
   document.body.appendChild(node);
 
   const start = performance.now();
-  const side = Math.random() > 0.5 ? 1 : -1;
-  const driftX = side * (46 + Math.random() * 62);
-  const driftY = 140 + Math.random() * 120;
-  const spin = side * (20 + Math.random() * 24);
-  const waveAmp = 10 + Math.random() * 14;
+  const spinSide = Math.random() > 0.5 ? 1 : -1;
+  const spin = spinSide * (26 + Math.random() * 30);
+  const centerX = window.innerWidth / 2;
+  const centerY = window.innerHeight / 2;
+  const endX = centerX + (Math.random() - 0.5) * 26;
+  const endY = centerY - 6 + (Math.random() - 0.5) * 20;
+  const dx = endX - startX;
+  const dy = endY - startY;
+  const distance = Math.max(1, Math.hypot(dx, dy));
+  const perpX = -dy / distance;
+  const perpY = dx / distance;
+  const side = dx >= 0 ? 1 : -1;
+  const travel = Math.max(300, Math.min(760, distance * 1.08));
+  const arcHeight = Math.max(130, Math.min(260, travel * 0.42));
+  const ctrl1X = startX + dx * 0.25 + side * travel * 0.16;
+  const ctrl1Y = startY - arcHeight;
+  const ctrl2X = startX + dx * 0.72 - side * travel * 0.11;
+  const ctrl2Y = endY - arcHeight * 0.5;
+
+  const bezierPoint = (
+    p0: number,
+    p1: number,
+    p2: number,
+    p3: number,
+    t: number
+  ) => {
+    const u = 1 - t;
+    return (
+      u * u * u * p0 +
+      3 * u * u * t * p1 +
+      3 * u * t * t * p2 +
+      t * t * t * p3
+    );
+  };
+
+  const easeOutQuint = (t: number) => 1 - Math.pow(1 - t, 5);
+  const easeInOutCubic = (t: number) =>
+    t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
   const popBurst = (x: number, y: number) => {
-    const burstCount = 12;
+    const burstCount = 24;
     for (let i = 0; i < burstCount; i += 1) {
       const p = document.createElement("span");
       const a = (Math.PI * 2 * i) / burstCount;
-      const dx = Math.cos(a) * (30 + Math.random() * 32);
-      const dy = Math.sin(a) * (30 + Math.random() * 32);
-      const s = 5 + Math.random() * 4;
+      const radial = 56 + Math.random() * 74;
+      const particleDx = Math.cos(a) * radial;
+      const particleDy = Math.sin(a) * radial;
+      const s = 6 + Math.random() * 7;
 
       p.style.position = "fixed";
       p.style.left = `${x - s / 2}px`;
@@ -96,17 +131,18 @@ export function animateRemoveFromTarget(
       p.style.borderRadius = "9999px";
       p.style.pointerEvents = "none";
       p.style.zIndex = "81";
-      p.style.background = i % 2 === 0 ? "#FB8500" : "#F92D0A";
-      p.style.boxShadow = "0 0 10px rgba(249,45,10,0.7)";
+      p.style.background =
+        i % 3 === 0 ? "#FB8500" : i % 3 === 1 ? "#F92D0A" : "rgba(255,255,255,0.95)";
+      p.style.boxShadow = "0 0 14px rgba(249,45,10,0.76), 0 0 22px rgba(251,133,0,0.44)";
       p.style.willChange = "transform, opacity";
       document.body.appendChild(p);
 
       const pStart = performance.now();
-      const pDur = 360 + Math.random() * 180;
+      const pDur = 460 + Math.random() * 260;
       const pTick = (now: number) => {
         const t = Math.min(1, (now - pStart) / pDur);
         const ease = 1 - Math.pow(1 - t, 3);
-        p.style.transform = `translate3d(${dx * ease}px, ${dy * ease}px, 0) scale(${1.18 - t * 0.78})`;
+        p.style.transform = `translate3d(${particleDx * ease}px, ${particleDy * ease}px, 0) scale(${1.42 - t * 0.9})`;
         p.style.opacity = `${1 - t}`;
         if (t < 1) {
           window.requestAnimationFrame(pTick);
@@ -116,19 +152,54 @@ export function animateRemoveFromTarget(
       };
       window.requestAnimationFrame(pTick);
     }
+
+    const shock = document.createElement("span");
+    shock.style.position = "fixed";
+    shock.style.left = `${x - 10}px`;
+    shock.style.top = `${y - 10}px`;
+    shock.style.width = "26px";
+    shock.style.height = "26px";
+    shock.style.borderRadius = "9999px";
+    shock.style.border = "2px solid rgba(255,255,255,0.95)";
+    shock.style.boxShadow = "0 0 0 5px rgba(251,133,0,0.5), 0 0 30px rgba(249,45,10,0.56)";
+    shock.style.pointerEvents = "none";
+    shock.style.zIndex = "81";
+    shock.style.willChange = "transform, opacity";
+    document.body.appendChild(shock);
+
+    const shockStart = performance.now();
+    const shockDur = 480;
+    const shockTick = (now: number) => {
+      const t = Math.min(1, (now - shockStart) / shockDur);
+      const e = 1 - Math.pow(1 - t, 3);
+      shock.style.transform = `scale(${1 + e * 6.6})`;
+      shock.style.opacity = `${1 - t}`;
+      if (t < 1) {
+        window.requestAnimationFrame(shockTick);
+      } else {
+        shock.remove();
+      }
+    };
+    window.requestAnimationFrame(shockTick);
   };
 
   const tick = (now: number) => {
     const t = Math.min(1, (now - start) / durationMs);
-    const ease = 1 - Math.pow(1 - t, 3);
-    const wave = Math.sin(t * Math.PI * 2.3) * waveAmp * (1 - t * 0.26);
-    const x = driftX * ease + wave;
-    const y = driftY * ease;
-    const growAtEnd = Math.max(0, (t - 0.72) / 0.28) * 0.85;
-    const scale = 0.95 - 0.2 * ease + growAtEnd;
-    const opacity = 1 - ease;
-    const currentX = startX + x;
-    const currentY = startY + y;
+    const ease = easeInOutCubic(t);
+    const curveX = bezierPoint(startX, ctrl1X, ctrl2X, endX, ease);
+    const curveY = bezierPoint(startY, ctrl1Y, ctrl2Y, endY, ease);
+    const safeDistance = Math.max(1, distance);
+    const travelPerpX = -dy / safeDistance;
+    const travelPerpY = dx / safeDistance;
+    const swirl = Math.sin(t * Math.PI * 2) * (kind === "heart" ? 52 : 34) * (1 - t * 0.16);
+    const currentX = curveX + travelPerpX * swirl;
+    const currentY = curveY + travelPerpY * swirl;
+    const growAtEnd = Math.max(0, (t - 0.78) / 0.22) * (kind === "product" ? 2.5 : 2.05);
+    const pulse = Math.sin(t * Math.PI) * 0.24;
+    const scale = 0.96 - 0.18 * easeOutQuint(t) + pulse + growAtEnd;
+    const opacity = 1 - easeOutQuint(t) * 0.96;
+    const x = currentX - startX;
+    const y = currentY - startY;
 
     const ropeDx = currentX - startX;
     const ropeDy = currentY - startY;
@@ -145,6 +216,14 @@ export function animateRemoveFromTarget(
       window.requestAnimationFrame(tick);
     } else {
       popBurst(currentX, currentY);
+      document.body.animate(
+        [
+          { filter: "brightness(1)" },
+          { filter: "brightness(1.06)" },
+          { filter: "brightness(1)" }
+        ],
+        { duration: 220, easing: "ease-out" }
+      );
       node.remove();
       rope.remove();
     }

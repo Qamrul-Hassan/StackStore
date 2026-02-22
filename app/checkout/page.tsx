@@ -1,20 +1,28 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/components/cart-provider";
 import { IMAGE_FALLBACK } from "@/lib/image-placeholder";
 
 export default function CheckoutPage() {
+  const { data: session } = useSession();
   const [customerEmail, setCustomerEmail] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"stripe" | "cod">("cod");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const cart = useCart();
   const router = useRouter();
+
+  useEffect(() => {
+    if (session?.user?.email) {
+      setCustomerEmail(session.user.email);
+    }
+  }, [session?.user?.email]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();

@@ -19,6 +19,14 @@ export default async function AdminPage() {
     createdAt: string;
     items: { id: string; quantity: number; productName: string }[];
   }[] = [];
+  let initialUsers: {
+    id: string;
+    name: string | null;
+    email: string;
+    role: string;
+    emailVerified: boolean;
+    createdAt: string;
+  }[] = [];
 
   try {
     initialProducts = await db.product.findMany({
@@ -29,6 +37,18 @@ export default async function AdminPage() {
       include: { items: { include: { product: true } } },
       orderBy: { createdAt: "desc" },
       take: 50
+    });
+    const users = await db.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        emailVerified: true,
+        createdAt: true
+      },
+      orderBy: { createdAt: "desc" },
+      take: 100
     });
 
     initialOrders = orders.map((order) => ({
@@ -44,9 +64,18 @@ export default async function AdminPage() {
         productName: item.product.name
       }))
     }));
+    initialUsers = users.map((user) => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      emailVerified: Boolean(user.emailVerified),
+      createdAt: user.createdAt.toISOString()
+    }));
   } catch {
     initialProducts = [];
     initialOrders = [];
+    initialUsers = [];
   }
 
   return (
@@ -54,6 +83,7 @@ export default async function AdminPage() {
       adminEmail={session.user?.email ?? ""}
       initialProducts={initialProducts.map(toProductDTO)}
       initialOrders={initialOrders}
+      initialUsers={initialUsers}
     />
   );
 }

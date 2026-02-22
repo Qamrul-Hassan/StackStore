@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { sendVerificationEmail } from "@/lib/email";
+import { env } from "@/lib/env";
 
 const payloadSchema = z.object({
   email: z.string().trim().email()
@@ -38,11 +39,16 @@ export async function POST(req: NextRequest) {
       } as never
     });
 
-    const mail = await sendVerificationEmail(email, token, req.nextUrl.origin);
+    const mail = await sendVerificationEmail(email, token, env.appUrl || req.nextUrl.origin);
     if (!mail.ok) {
+      const isProd = process.env.NODE_ENV === "production";
       return NextResponse.json(
-        { ok: true, warning: mail.message, verifyUrl: mail.verifyUrl, message: "Verification link generated." },
-        { status: 202 }
+        {
+          error: isProd
+            ? "Could not send verification email. Configure email provider and try again."
+            : `Could not send verification email. ${mail.message}`
+        },
+        { status: 500 }
       );
     }
 

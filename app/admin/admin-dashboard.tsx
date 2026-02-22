@@ -23,6 +23,14 @@ type Props = {
     createdAt: string;
     items: { id: string; quantity: number; productName: string }[];
   }[];
+  initialUsers: {
+    id: string;
+    name: string | null;
+    email: string;
+    role: string;
+    emailVerified: boolean;
+    createdAt: string;
+  }[];
 };
 
 type ProductFormState = {
@@ -36,7 +44,7 @@ type ProductFormState = {
   isActive: boolean;
 };
 
-type PanelKey = "products" | "orders" | "account";
+type PanelKey = "products" | "orders" | "users" | "account";
 type ProductFilter = "all" | "active" | "hidden" | "low-stock";
 
 const emptyState: ProductFormState = {
@@ -76,11 +84,12 @@ function orderStatusVariant(status: string): "default" | "secondary" | "outline"
   return "default";
 }
 
-export function AdminDashboard({ adminEmail, initialProducts, initialOrders }: Props) {
+export function AdminDashboard({ adminEmail, initialProducts, initialOrders, initialUsers }: Props) {
   const [panel, setPanel] = useState<PanelKey>("products");
 
   const [products, setProducts] = useState(initialProducts);
   const [orders, setOrders] = useState(initialOrders);
+  const [users, setUsers] = useState(initialUsers);
 
   const [form, setForm] = useState<ProductFormState>(emptyState);
   const [saving, setSaving] = useState(false);
@@ -91,6 +100,7 @@ export function AdminDashboard({ adminEmail, initialProducts, initialOrders }: P
 
   const [orderQuery, setOrderQuery] = useState("");
   const [orderFilterStatus, setOrderFilterStatus] = useState<string>("ALL");
+  const [userQuery, setUserQuery] = useState("");
 
   const [accountEmail, setAccountEmail] = useState(adminEmail);
   const [currentPassword, setCurrentPassword] = useState("");
@@ -111,9 +121,11 @@ export function AdminDashboard({ adminEmail, initialProducts, initialOrders }: P
       const payload = (await res.json()) as {
         products: ProductDTO[];
         orders: Props["initialOrders"];
+        users: Props["initialUsers"];
       };
       setProducts(payload.products);
       setOrders(payload.orders);
+      setUsers(payload.users);
       setLastSyncedAt(new Date());
     };
 
@@ -129,6 +141,7 @@ export function AdminDashboard({ adminEmail, initialProducts, initialOrders }: P
     const activeProducts = products.filter((p) => p.isActive).length;
     const lowStockProducts = products.filter((p) => p.stock <= 5).length;
     const totalOrders = orders.length;
+    const totalUsers = users.length;
     const pendingOrders = orders.filter((o) => o.status === "PENDING" || o.status === "PROCESSING").length;
     const totalRevenue = orders.reduce((sum, order) => sum + order.totalAmount, 0);
 
@@ -137,10 +150,11 @@ export function AdminDashboard({ adminEmail, initialProducts, initialOrders }: P
       activeProducts,
       lowStockProducts,
       totalOrders,
+      totalUsers,
       pendingOrders,
       totalRevenue
     };
-  }, [orders, products]);
+  }, [orders, products, users]);
 
   const filteredProducts = useMemo(() => {
     const q = productQuery.trim().toLowerCase();
@@ -173,6 +187,18 @@ export function AdminDashboard({ adminEmail, initialProducts, initialOrders }: P
       return true;
     });
   }, [orderFilterStatus, orderQuery, orders]);
+
+  const filteredUsers = useMemo(() => {
+    const q = userQuery.trim().toLowerCase();
+    return users.filter((user) => {
+      if (!q) return true;
+      return (
+        user.email.toLowerCase().includes(q) ||
+        (user.name ?? "").toLowerCase().includes(q) ||
+        user.role.toLowerCase().includes(q)
+      );
+    });
+  }, [userQuery, users]);
 
   function setField<K extends keyof ProductFormState>(key: K, value: ProductFormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -295,6 +321,16 @@ export function AdminDashboard({ adminEmail, initialProducts, initialOrders }: P
     setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status } : o)));
   }
 
+  async function removeUser(userId: string) {
+    const res = await fetch(`/api/admin/users/${userId}`, { method: "DELETE" });
+    const payload = await readSafeJson<{ error?: string }>(res);
+    if (!res.ok) {
+      window.alert(payload?.error ?? "Failed to delete user.");
+      return;
+    }
+    setUsers((prev) => prev.filter((u) => u.id !== userId));
+  }
+
   return (
     <div className="space-y-6">
       <section className="overflow-hidden rounded-3xl border border-white/30 bg-[linear-gradient(120deg,rgba(33,14,20,0.92)_0%,rgba(40,50,63,0.95)_45%,rgba(249,45,10,0.84)_100%)] p-5 text-white shadow-[0_26px_50px_-30px_rgba(20,10,16,0.85)] sm:p-7">
@@ -317,7 +353,7 @@ export function AdminDashboard({ adminEmail, initialProducts, initialOrders }: P
         </div>
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
+      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-7">
         <Card className="xl:col-span-1">
           <CardContent className="pt-5">
             <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Products</p>
@@ -350,6 +386,12 @@ export function AdminDashboard({ adminEmail, initialProducts, initialOrders }: P
         </Card>
         <Card className="xl:col-span-1">
           <CardContent className="pt-5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Users</p>
+            <p className="mt-2 text-2xl font-bold text-indigo-600">{stats.totalUsers}</p>
+          </CardContent>
+        </Card>
+        <Card className="xl:col-span-1">
+          <CardContent className="pt-5">
             <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Revenue</p>
             <p className="mt-2 text-2xl font-bold">${stats.totalRevenue.toFixed(2)}</p>
           </CardContent>
@@ -370,6 +412,13 @@ export function AdminDashboard({ adminEmail, initialProducts, initialOrders }: P
           onClick={() => setPanel("orders")}
         >
           Orders
+        </Button>
+        <Button
+          type="button"
+          variant={panel === "users" ? "default" : "outline"}
+          onClick={() => setPanel("users")}
+        >
+          Users
         </Button>
         <Button
           type="button"
@@ -638,6 +687,76 @@ export function AdminDashboard({ adminEmail, initialProducts, initialOrders }: P
                       <TableRow>
                         <TableCell colSpan={7} className="py-8 text-center text-zinc-500">
                           No orders found for this filter.
+                        </TableCell>
+                      </TableRow>
+                    ) : null}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+      ) : null}
+
+      {panel === "users" ? (
+        <section>
+          <Card>
+            <CardHeader className="space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <CardTitle>Registered Users</CardTitle>
+                <Badge variant="outline">{filteredUsers.length} shown</Badge>
+              </div>
+              <Input
+                value={userQuery}
+                onChange={(e) => setUserQuery(e.target.value)}
+                placeholder="Search by email, name, or role"
+              />
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto rounded-xl border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Role</TableHead>
+                      <TableHead>Verified</TableHead>
+                      <TableHead>Created</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredUsers.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell>{user.name ?? "-"}</TableCell>
+                        <TableCell>{user.email}</TableCell>
+                        <TableCell>
+                          <Badge variant={user.role === "ADMIN" ? "secondary" : "outline"}>
+                            {user.role}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={user.emailVerified ? "secondary" : "destructive"}>
+                            {user.emailVerified ? "Verified" : "Unverified"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => removeUser(user.id)}
+                            disabled={user.role === "ADMIN" || user.email.toLowerCase() === adminEmail.toLowerCase()}
+                          >
+                            Delete
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {filteredUsers.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="py-8 text-center text-zinc-500">
+                          No users found for this filter.
                         </TableCell>
                       </TableRow>
                     ) : null}
