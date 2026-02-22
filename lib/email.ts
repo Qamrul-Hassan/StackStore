@@ -1,4 +1,5 @@
 import { absoluteUrl } from "@/lib/seo";
+import nodemailer from "nodemailer";
 
 function escapeHtml(value: string) {
   return value
@@ -23,13 +24,53 @@ type SendMailInput = {
 function getMailConfig() {
   const from = process.env.EMAIL_FROM;
   const resendKey = process.env.RESEND_API_KEY;
-  if (!resendKey || !from) {
+  const smtpHost = process.env.SMTP_HOST;
+  const smtpPortRaw = process.env.SMTP_PORT;
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_PASS;
+  const smtpSecure = process.env.SMTP_SECURE === "true";
+
+  if (from && smtpHost && smtpPortRaw && smtpUser && smtpPass) {
+    const smtpPort = Number(smtpPortRaw);
+    if (Number.isNaN(smtpPort) || smtpPort <= 0) {
+      return {
+        ok: false as const,
+        message: "Invalid SMTP_PORT. It must be a valid number."
+      };
+    }
     return {
-      ok: false as const,
-      message: "Email provider is not configured. Set RESEND_API_KEY and EMAIL_FROM."
+      ok: true as const,
+      provider: "smtp" as const,
+      from,
+      smtpHost,
+      smtpPort,
+      smtpUser,
+      smtpPass,
+      smtpSecure
     };
   }
-  return { ok: true as const, from, resendKey };
+
+  if (from && resendKey) {
+    return {
+      ok: true as const,
+      provider: "resend" as const,
+      from,
+      resendKey
+    };
+  }
+
+  if (!from) {
+    return {
+      ok: false as const,
+      message: "Email provider is not configured. Set EMAIL_FROM."
+    };
+  }
+
+  return {
+    ok: false as const,
+    message:
+      "Email provider is not configured. Use SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASS (recommended for Gmail) or RESEND_API_KEY."
+  };
 }
 
 async function sendMail(input: SendMailInput): Promise<MailResult> {
@@ -39,6 +80,34 @@ async function sendMail(input: SendMailInput): Promise<MailResult> {
   }
 
   const to = Array.isArray(input.to) ? input.to : [input.to];
+  if (config.provider === "smtp") {
+    try {
+      const transport = nodemailer.createTransport({
+        host: config.smtpHost,
+        port: config.smtpPort,
+        secure: config.smtpSecure || config.smtpPort === 465,
+        auth: {
+          user: config.smtpUser,
+          pass: config.smtpPass
+        }
+      });
+
+      await transport.sendMail({
+        from: config.from,
+        to: to.join(", "),
+        subject: input.subject,
+        html: input.html,
+        replyTo: input.replyTo
+      });
+      return { ok: true };
+    } catch (error) {
+      return {
+        ok: false,
+        message: `Failed to send email via SMTP: ${error instanceof Error ? error.message : "Unknown SMTP error"}`
+      };
+    }
+  }
+
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
