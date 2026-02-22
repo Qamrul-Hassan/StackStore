@@ -21,5 +21,13 @@ export const checkoutSchema = z.object({
   paymentMethod: z.enum(["stripe", "cod"])
 });
 
+export const contactSchema = z.object({
+  name: z.string().trim().min(2).max(80),
+  email: z.string().trim().email(),
+  phone: z.string().trim().min(7).max(25),
+  message: z.string().trim().min(10).max(2000)
+});
+
 export type ProductInput = z.infer<typeof productInputSchema>;
 export type CheckoutInput = z.infer<typeof checkoutSchema>;
+export type ContactInput = z.infer<typeof contactSchema>;
