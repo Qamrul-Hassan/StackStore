@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { signOut } from "next-auth/react";
+import { Eye, EyeOff } from "lucide-react";
 import { ProductDTO } from "@/lib/serializers";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -106,6 +107,12 @@ export function AdminDashboard({ adminEmail, initialProducts, initialOrders, ini
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [currentPasswordFocused, setCurrentPasswordFocused] = useState(false);
+  const [newPasswordFocused, setNewPasswordFocused] = useState(false);
+  const [confirmPasswordFocused, setConfirmPasswordFocused] = useState(false);
   const [accountSaving, setAccountSaving] = useState(false);
   const [accountMessage, setAccountMessage] = useState("");
   const [accountError, setAccountError] = useState("");
@@ -784,42 +791,89 @@ export function AdminDashboard({ adminEmail, initialProducts, initialOrders, ini
                     type="email"
                     value={accountEmail}
                     onChange={(e) => setAccountEmail(e.target.value)}
+                    autoComplete="off"
+                    spellCheck={false}
                     required
                   />
                 </div>
                 <div className="grid gap-3 md:grid-cols-3">
                   <div className="space-y-2">
                     <Label htmlFor="admin-current-password">Current Password</Label>
-                    <Input
-                      id="admin-current-password"
-                      name="admin-current-password"
-                      type="password"
-                      value={currentPassword}
-                      onChange={(e) => setCurrentPassword(e.target.value)}
-                      placeholder="Required for password change"
-                    />
+                    <div className="relative">
+                      <Input
+                        id="admin-current-password"
+                        name="admin-current-password"
+                        type={showCurrentPassword ? "text" : "password"}
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        onFocus={() => setCurrentPasswordFocused(true)}
+                        onBlur={() => setCurrentPasswordFocused(false)}
+                        placeholder="Required for password change"
+                        className={currentPassword || currentPasswordFocused ? "pr-12" : ""}
+                      />
+                      {currentPassword || currentPasswordFocused ? (
+                        <button
+                          type="button"
+                          aria-label={showCurrentPassword ? "Hide password" : "Show password"}
+                          onClick={() => setShowCurrentPassword((prev) => !prev)}
+                          className="absolute right-2 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-full border border-[#d6deea] bg-[linear-gradient(145deg,#ffffff,#eef3f9)] text-[#3f4b5d] shadow-[0_8px_16px_-10px_rgba(24,32,44,0.55)] transition hover:scale-105 hover:border-[#FB8500]/70 hover:text-[#F92D0A]"
+                        >
+                          {showCurrentPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                        </button>
+                      ) : null}
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="admin-new-password">New Password</Label>
-                    <Input
-                      id="admin-new-password"
-                      name="admin-new-password"
-                      type="password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="Leave blank to keep"
-                    />
+                    <div className="relative">
+                      <Input
+                        id="admin-new-password"
+                        name="admin-new-password"
+                        type={showNewPassword ? "text" : "password"}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        onFocus={() => setNewPasswordFocused(true)}
+                        onBlur={() => setNewPasswordFocused(false)}
+                        placeholder="Leave blank to keep"
+                        className={newPassword || newPasswordFocused ? "pr-12" : ""}
+                      />
+                      {newPassword || newPasswordFocused ? (
+                        <button
+                          type="button"
+                          aria-label={showNewPassword ? "Hide password" : "Show password"}
+                          onClick={() => setShowNewPassword((prev) => !prev)}
+                          className="absolute right-2 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-full border border-[#d6deea] bg-[linear-gradient(145deg,#ffffff,#eef3f9)] text-[#3f4b5d] shadow-[0_8px_16px_-10px_rgba(24,32,44,0.55)] transition hover:scale-105 hover:border-[#FB8500]/70 hover:text-[#F92D0A]"
+                        >
+                          {showNewPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                        </button>
+                      ) : null}
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="admin-confirm-password">Confirm Password</Label>
-                    <Input
-                      id="admin-confirm-password"
-                      name="admin-confirm-password"
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Repeat new password"
-                    />
+                    <div className="relative">
+                      <Input
+                        id="admin-confirm-password"
+                        name="admin-confirm-password"
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        onFocus={() => setConfirmPasswordFocused(true)}
+                        onBlur={() => setConfirmPasswordFocused(false)}
+                        placeholder="Repeat new password"
+                        className={confirmPassword || confirmPasswordFocused ? "pr-12" : ""}
+                      />
+                      {confirmPassword || confirmPasswordFocused ? (
+                        <button
+                          type="button"
+                          aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                          onClick={() => setShowConfirmPassword((prev) => !prev)}
+                          className="absolute right-2 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-full border border-[#d6deea] bg-[linear-gradient(145deg,#ffffff,#eef3f9)] text-[#3f4b5d] shadow-[0_8px_16px_-10px_rgba(24,32,44,0.55)] transition hover:scale-105 hover:border-[#FB8500]/70 hover:text-[#F92D0A]"
+                        >
+                          {showConfirmPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                        </button>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground">

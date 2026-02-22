@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -57,12 +58,15 @@ function AccountPageContent() {
 
   const [signInEmail, setSignInEmail] = useState("");
   const [signInPassword, setSignInPassword] = useState("");
+  const [showSignInPassword, setShowSignInPassword] = useState(false);
   const [signInEmailTouched, setSignInEmailTouched] = useState(false);
 
   const [name, setName] = useState("");
   const [signUpEmail, setSignUpEmail] = useState("");
   const [signUpPassword, setSignUpPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showSignUpPassword, setShowSignUpPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [signUpEmailTouched, setSignUpEmailTouched] = useState(false);
 
   const [loading, setLoading] = useState(false);
@@ -343,21 +347,23 @@ function AccountPageContent() {
         <div className="grid gap-8 lg:grid-cols-2">
           <div className="glass-panel section-shell section-single-cart cart-left rounded-2xl p-8">
             <h2 className="text-3xl font-semibold text-[#210E14]">Sign In</h2>
-            <form className="mt-6 space-y-4" onSubmit={onSignIn}>
+            <form className="mt-6 space-y-4" onSubmit={onSignIn} autoComplete="off">
               <Input
                 type="email"
                 value={signInEmail}
                 onChange={(e) => setSignInEmail(e.target.value)}
                 onBlur={() => setSignInEmailTouched(true)}
                 placeholder="name@example.com"
-                autoComplete="email"
+                autoComplete="off"
                 inputMode="email"
+                spellCheck={false}
                 className="h-12 border-[#cfd8e3] bg-white/95 text-[#111827] placeholder:text-[#6b7280]"
                 required
               />
               {signInEmailInvalid ? <p className="-mt-2 text-xs text-red-600">Use a valid email format.</p> : null}
-              <Input
-                type="password"
+              <PasswordField
+                show={showSignInPassword}
+                onToggle={() => setShowSignInPassword((prev) => !prev)}
                 value={signInPassword}
                 onChange={(e) => setSignInPassword(e.target.value)}
                 placeholder="Enter your password"
@@ -388,7 +394,7 @@ function AccountPageContent() {
 
           <div className="glass-panel section-shell section-single-cart cart-right rounded-2xl p-8">
             <h2 className="text-3xl font-semibold text-[#210E14]">Sign Up</h2>
-            <form className="mt-6 space-y-4" onSubmit={onSignUp}>
+            <form className="mt-6 space-y-4" onSubmit={onSignUp} autoComplete="off">
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -403,14 +409,16 @@ function AccountPageContent() {
                 onChange={(e) => setSignUpEmail(e.target.value)}
                 onBlur={() => setSignUpEmailTouched(true)}
                 placeholder="name@example.com"
-                autoComplete="email"
+                autoComplete="off"
                 inputMode="email"
+                spellCheck={false}
                 className="h-12 border-[#cfd8e3] bg-white/95 text-[#111827] placeholder:text-[#6b7280]"
                 required
               />
               {signUpEmailInvalid ? <p className="-mt-2 text-xs text-red-600">Use a valid email format.</p> : null}
-              <Input
-                type="password"
+              <PasswordField
+                show={showSignUpPassword}
+                onToggle={() => setShowSignUpPassword((prev) => !prev)}
                 value={signUpPassword}
                 onChange={(e) => setSignUpPassword(e.target.value)}
                 placeholder="Password (min 8)"
@@ -419,8 +427,9 @@ function AccountPageContent() {
                 required
                 minLength={8}
               />
-              <Input
-                type="password"
+              <PasswordField
+                show={showConfirmPassword}
+                onToggle={() => setShowConfirmPassword((prev) => !prev)}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Confirm password"
@@ -480,6 +489,59 @@ function statusClass(status: string) {
     return "bg-blue-100 text-blue-700";
   }
   return "bg-amber-100 text-amber-700";
+}
+
+function PasswordField({
+  value,
+  onChange,
+  placeholder,
+  autoComplete,
+  className,
+  required,
+  minLength,
+  show,
+  onToggle
+}: {
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder: string;
+  autoComplete?: string;
+  className?: string;
+  required?: boolean;
+  minLength?: number;
+  show: boolean;
+  onToggle: () => void;
+}) {
+  const [isFocused, setIsFocused] = useState(false);
+  const hasValue = value.length > 0;
+  const showToggle = hasValue || isFocused;
+
+  return (
+    <div className="relative">
+      <Input
+        type={show ? "text" : "password"}
+        value={value}
+        onChange={onChange}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        placeholder={placeholder}
+        autoComplete={autoComplete}
+        className={`${className ?? ""} ${showToggle ? "pr-12" : ""}`}
+        required={required}
+        minLength={minLength}
+      />
+      {showToggle ? (
+        <button
+          type="button"
+          aria-label={show ? "Hide password" : "Show password"}
+          onClick={onToggle}
+          className="absolute right-2 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-full border border-[#d6deea] bg-[linear-gradient(145deg,#ffffff,#eef3f9)] text-[#3f4b5d] shadow-[0_8px_16px_-10px_rgba(24,32,44,0.55)] transition hover:scale-105 hover:border-[#FB8500]/70 hover:text-[#F92D0A]"
+        >
+          {show ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+        </button>
+      ) : null}
+    </div>
+  );
 }
 
 

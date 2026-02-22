@@ -336,3 +336,16 @@ body {
   background: rgba(249, 45, 10, 0.18);
   color: #210e14;
 }
+
+/* Keep only custom password toggle icon (hide browser-native reveal controls). */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-contacts-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
+  pointer-events: none;
+}
