@@ -35,10 +35,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json({
-      ok: true,
-      message: "Message sent successfully. We emailed you a confirmation."
-    });
+    if (!sent.customerReplySent) {
+      const isProd = process.env.NODE_ENV === "production";
+      return NextResponse.json({
+        ok: true,
+        message: isProd
+          ? "Message sent successfully. Our team received your message."
+          : `Message sent successfully. Owner notified, but customer auto-reply failed: ${sent.warning ?? "unknown reason"}`
+      });
+    }
+
+    return NextResponse.json({ ok: true, message: "Message sent successfully. We emailed you a confirmation." });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unexpected error.";
     return NextResponse.json({ error: message }, { status: 500 });

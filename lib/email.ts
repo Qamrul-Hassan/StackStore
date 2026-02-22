@@ -130,25 +130,30 @@ export async function sendContactEmails(input: {
     </div>
   `;
 
-  const [ownerMail, customerMail] = await Promise.all([
-    sendMail({
-      to: input.toOwnerEmail,
-      subject: `New contact message from ${input.name}`,
-      html: ownerHtml,
-      replyTo: input.email
-    }),
-    sendMail({
-      to: input.email,
-      subject: "We received your message - StackStore",
-      html: customerHtml
-    })
-  ]);
+  const ownerMail = await sendMail({
+    to: input.toOwnerEmail,
+    subject: `New contact message from ${input.name}`,
+    html: ownerHtml,
+    replyTo: input.email
+  });
 
   if (!ownerMail.ok) {
     return { ok: false as const, message: ownerMail.message };
   }
+
+  const customerMail = await sendMail({
+    to: input.email,
+    subject: "We received your message - StackStore",
+    html: customerHtml
+  });
+
   if (!customerMail.ok) {
-    return { ok: false as const, message: customerMail.message };
+    return {
+      ok: true as const,
+      customerReplySent: false as const,
+      warning: customerMail.message
+    };
   }
-  return { ok: true as const };
+
+  return { ok: true as const, customerReplySent: true as const };
 }
