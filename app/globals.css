@@ -33,7 +33,15 @@
 
 html,
 body {
+  width: 100%;
+  max-width: 100%;
   overflow-x: hidden;
+  overflow-x: clip;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -47,7 +55,38 @@ body {
   background-size: auto, auto, auto;
   background-position: 6% -6%, 100% 0%, center;
   min-height: 100vh;
+  min-height: 100dvh;
   color: #f4f5f8;
+}
+
+main,
+header,
+footer {
+  max-width: 100%;
+}
+
+/* Stabilize media and form controls across Chromium/Firefox/Safari/iOS. */
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+input,
+textarea,
+select,
+button {
+  font: inherit;
+}
+
+button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .font-display {
@@ -91,6 +130,17 @@ body {
     0 34px 48px -36px rgba(33, 14, 20, 0.82),
     0 10px 26px -18px rgba(40, 50, 63, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.68);
+}
+
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .glass-panel {
+    background: linear-gradient(
+      170deg,
+      rgba(255, 255, 255, 0.98) 0%,
+      rgba(241, 245, 250, 0.96) 52%,
+      rgba(228, 235, 243, 0.94) 100%
+    );
+  }
 }
 
 .section-shell {
@@ -348,4 +398,15 @@ input[type="password"]::-webkit-contacts-auto-fill-button {
   visibility: hidden;
   display: none !important;
   pointer-events: none;
+}
+
+/* Keep autofill readable on WebKit browsers. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus {
+  -webkit-text-fill-color: #210E14;
+  transition: background-color 9999s ease-out 0s;
 }

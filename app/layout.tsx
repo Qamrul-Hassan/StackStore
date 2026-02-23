@@ -60,8 +60,10 @@ export default function RootLayout({
       <body suppressHydrationWarning className={`${outfit.variable} ${syne.variable}`}>
         <Providers>
           <SiteHeader />
-          <div aria-hidden className="h-[190px] md:h-[132px]" />
-          <main className="relative main-cart-bg mx-auto max-w-6xl px-4 pb-8 pt-0 md:px-6">
+          <main
+            className="relative main-cart-bg mx-auto max-w-6xl overflow-x-clip px-4 pb-8 pt-0 md:px-6"
+            style={{ paddingBottom: "calc(2rem + env(safe-area-inset-bottom, 0px))" }}
+          >
             {children}
           </main>
           <BrandShowcase />

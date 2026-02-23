@@ -35,7 +35,7 @@ export function SiteHeader() {
   const [mobileQuery, setMobileQuery] = useState("");
 
   return (
-    <header className="fixed inset-x-0 top-0 z-[70] border-b border-[#d2d8df] bg-white/85 shadow-[0_18px_40px_-26px_rgba(33,14,20,0.88)] backdrop-blur-lg">
+    <header className="sticky top-0 z-[70] w-full overflow-x-clip border-b border-[#d2d8df] bg-white/90 shadow-[0_18px_40px_-26px_rgba(33,14,20,0.88)] backdrop-blur-lg">
       <div className="bg-gradient-to-r from-[#210E14] via-[#28323F] to-[#210E14] text-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-3 py-2 text-[10px] sm:px-4 sm:text-[11px] md:px-6">
           <p className="w-full text-center leading-tight md:w-auto">
@@ -50,12 +50,12 @@ export function SiteHeader() {
         </div>
       </div>
 
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-3 py-3 sm:px-4 md:gap-4 md:px-6 md:py-4">
-        <Link href="/" className="flex items-center gap-3">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-3 py-3 sm:px-4 md:px-6 lg:gap-4 lg:py-4">
+        <Link href="/" className="min-w-0 flex items-center gap-3">
           <Logo />
         </Link>
 
-        <nav className="hidden items-center gap-2 rounded-full border border-[#d9e0e7] bg-white/90 p-1.5 shadow-[0_12px_26px_-18px_rgba(33,14,20,0.8)] md:flex">
+        <nav className="hidden items-center gap-2 rounded-full border border-[#d9e0e7] bg-white/90 p-1.5 shadow-[0_12px_26px_-18px_rgba(33,14,20,0.8)] lg:flex">
           {navLinks.map((item) => (
             <Link
               key={item.href}
@@ -70,14 +70,14 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
+        <div className="shrink-0 flex items-center gap-2 sm:gap-3 md:gap-4">
           <SearchBox
             id="desktop-site-search"
             query={desktopQuery}
             setQuery={setDesktopQuery}
             products={searchProducts}
             placeholder="What are you looking for?"
-            className="hidden md:flex"
+            className="hidden lg:flex"
           />
           <IconWrap icon={<Heart className="size-5" />} badge={hydrated ? wishlist.count : 0} href="/wishlist" flyTarget="wishlist" />
           <IconWrap icon={<ShoppingCart className="size-5" />} badge={hydrated ? cartCount : 0} href="/cart" flyTarget="cart" />
@@ -85,7 +85,7 @@ export function SiteHeader() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl px-3 pb-3 sm:px-4 md:hidden">
+      <div className="mx-auto max-w-6xl px-3 pb-3 sm:px-4 lg:hidden">
         <SearchBox
           id="mobile-site-search"
           query={mobileQuery}
@@ -94,7 +94,7 @@ export function SiteHeader() {
           placeholder="Search products..."
           className="mb-2"
         />
-        <nav className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
+        <nav className="no-scrollbar flex gap-2 overflow-x-auto pb-1 md:flex-wrap md:overflow-visible">
           {navLinks.map((item) => (
             <Link
               key={item.href}
@@ -161,7 +161,7 @@ function SearchBox({
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         autoComplete="off"
-        className="w-full bg-transparent text-sm text-[#210E14] caret-[#F92D0A] outline-none placeholder:text-[#9ca3af] md:w-40"
+        className="w-full bg-transparent text-sm text-[#210E14] caret-[#F92D0A] outline-none placeholder:text-[#9ca3af] lg:w-40"
         placeholder={placeholder}
       />
       <button
