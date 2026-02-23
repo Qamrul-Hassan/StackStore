@@ -66,7 +66,7 @@ export default function RootLayout({
         <Providers>
           <SiteHeader />
           <main
-            className="relative main-cart-bg mx-auto max-w-6xl overflow-x-clip px-4 pb-8 pt-0 md:px-6"
+            className="relative main-cart-bg mx-auto max-w-6xl px-4 pb-8 pt-0 md:px-6"
             style={{ paddingBottom: "calc(2rem + env(safe-area-inset-bottom, 0px))" }}
           >
             {children}

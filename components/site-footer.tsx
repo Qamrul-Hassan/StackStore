@@ -46,9 +46,13 @@ export function SiteFooter() {
 
         <div className="space-y-3">
           <p className="text-[1.55rem] font-semibold leading-none">Quick Link</p>
-          <FooterLink href="/">Privacy Policy</FooterLink>
-          <FooterLink href="/">Terms Of Use</FooterLink>
-          <FooterLink href="/">FAQ</FooterLink>
+          <FooterLink href="/policies/privacy">Privacy Policy</FooterLink>
+          <FooterLink href="/policies/terms">Terms Of Use</FooterLink>
+          <FooterLink href="/policies/refund">Refund Policy</FooterLink>
+          <FooterLink href="/policies/shipping">Shipping Policy</FooterLink>
+          <FooterLink href="/policies/cookies">Cookie Policy</FooterLink>
+          <FooterLink href="/faq">FAQ</FooterLink>
+          <FooterLink href="/reviews">Reviews</FooterLink>
           <FooterLink href="/contact">Contact</FooterLink>
         </div>
 
