@@ -2,7 +2,7 @@
 
 Modern full-stack e-commerce project built with Next.js, Prisma, NextAuth, and Tailwind CSS.
 
-Live demo: https://stack-store.vercel.app/
+Live demo: [https://stack-store.vercel.app/](https://stack-store.vercel.app/)
 
 ## Tech Stack
 
@@ -73,20 +73,20 @@ CLOUDINARY_API_SECRET=""
 npm install
 ```
 
-2. Run Prisma migrations and generate client
+1. Run Prisma migrations and generate client
 
 ```bash
 npx prisma migrate dev
 npx prisma generate
 ```
 
-3. Seed sample data
+1. Seed sample data
 
 ```bash
 npm run prisma:seed
 ```
 
-4. Start development server
+1. Start development server
 
 ```bash
 npm run dev
@@ -108,9 +108,9 @@ npm run prisma:seed
 ## Deploy (Vercel)
 
 1. Push code to GitHub
-2. Import repo in Vercel
-3. Add all required environment variables
-4. Deploy
+1. Import repo in Vercel
+1. Add all required environment variables
+1. Deploy
 
 ## Notes
 
