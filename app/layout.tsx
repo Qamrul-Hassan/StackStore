@@ -43,6 +43,11 @@ export const metadata: Metadata = {
     title: "StackStore | Next Commerce",
     description: "Bold, premium e-commerce storefront powered by Next.js"
   },
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg"
+  },
   twitter: {
     card: "summary_large_image",
     title: "StackStore | Next Commerce",
